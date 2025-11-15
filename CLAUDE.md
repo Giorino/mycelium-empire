@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository. You are free to use MCPs. If you have any question related to godot, use context7 MCP, other than that please use godot MCP.
 
 ## Project Overview
 

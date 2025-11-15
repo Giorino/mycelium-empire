@@ -1,0 +1,10 @@
+<svg width="32" height="16" xmlns="http://www.w3.org/2000/svg">
+  <!-- Wall tile (0,0) - Dark grey -->
+  <rect x="0" y="0" width="16" height="16" fill="#3a3a3a"/>
+  <rect x="2" y="2" width="12" height="12" fill="#4a4a4a"/>
+
+  <!-- Nutrient tile (1,0) - Glowing cyan/blue -->
+  <rect x="16" y="0" width="16" height="16" fill="#1a4a5a"/>
+  <circle cx="24" cy="8" r="4" fill="#00ffff" opacity="0.8"/>
+  <circle cx="24" cy="8" r="2" fill="#ffffff"/>
+</svg>
