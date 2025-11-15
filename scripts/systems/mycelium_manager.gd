@@ -1,0 +1,339 @@
+class_name MyceliumManager
+extends Node2D
+
+## Manages mycelium spread mechanics, growth, and visualization
+## Mycelium provides pathways for minions and territorial control
+
+signal mycelium_placed(grid_pos: Vector2i)
+signal mycelium_spread(grid_pos: Vector2i)
+signal nutrients_changed(current: int, max: int)
+
+@export_group("Growth Parameters")
+@export var growth_interval: float = 2.0  # Seconds between growth ticks
+@export var spread_chance: float = 0.7    # Probability of spreading to adjacent tile
+@export var max_spread_per_tick: int = 3  # Maximum tiles to spread per growth tick
+
+@export_group("Placement Costs")
+@export var initial_placement_cost: int = 10  # Nutrients required to place initial mycelium
+@export var starting_nutrients: int = 50      # Starting resource amount
+
+@export_group("Visual Settings")
+@export var enable_glow: bool = true
+@export var glow_energy: float = 1.5
+@export var glow_radius: float = 32.0
+@export var particle_amount: int = 16
+
+# References
+@onready var mycelium_layer: TileMapLayer = $MyceliumLayer
+@onready var cave_world: Node = get_parent()
+
+# Tile atlas coordinates
+const MYCELIUM_BASE = Vector2i(0, 0)
+const MYCELIUM_GROWTH = Vector2i(1, 0)
+const MYCELIUM_DENSE = Vector2i(2, 0)
+const TILESET_SOURCE_ID = 0
+
+# Growth tracking
+var growth_timer: float = 0.0
+var mycelium_tiles: Dictionary = {}  # Vector2i -> growth_stage (0-2)
+var active_growth_frontier: Array[Vector2i] = []  # Tiles that can spread
+
+# Resources
+var current_nutrients: int = 0
+
+# Light pool for performance
+var light_pool: Array[PointLight2D] = []
+var active_lights: Dictionary = {}  # Vector2i -> PointLight2D
+
+
+func _ready() -> void:
+	current_nutrients = starting_nutrients
+	nutrients_changed.emit(current_nutrients, starting_nutrients)
+	_initialize_light_pool()
+
+
+func _process(delta: float) -> void:
+	_update_growth(delta)
+
+
+## Initialize pool of light nodes for performance
+func _initialize_light_pool() -> void:
+	# Pre-create 100 lights for pooling
+	for i in range(100):
+		var light = PointLight2D.new()
+		light.enabled = false
+		light.texture = _create_light_gradient()
+		light.texture_scale = 2.0
+		light.energy = glow_energy
+		light.color = Color(0.0, 0.8, 1.0)  # Cyan glow
+		light.range_layer_max = 2
+		add_child(light)
+		light_pool.append(light)
+
+
+## Create a radial gradient texture for lights
+func _create_light_gradient() -> GradientTexture2D:
+	var gradient = Gradient.new()
+	gradient.set_color(0, Color(1, 1, 1, 1))
+	gradient.set_color(1, Color(1, 1, 1, 0))
+
+	var gradient_texture = GradientTexture2D.new()
+	gradient_texture.gradient = gradient
+	gradient_texture.fill = GradientTexture2D.FILL_RADIAL
+	gradient_texture.width = 64
+	gradient_texture.height = 64
+
+	return gradient_texture
+
+
+## Get a light from the pool
+func _get_light_from_pool() -> PointLight2D:
+	for light in light_pool:
+		if not light.enabled:
+			return light
+
+	# Pool exhausted, create new light
+	var light = PointLight2D.new()
+	light.texture = _create_light_gradient()
+	light.texture_scale = 2.0
+	light.energy = glow_energy
+	light.color = Color(0.0, 0.8, 1.0)
+	add_child(light)
+	light_pool.append(light)
+	return light
+
+
+## Return light to pool
+func _return_light_to_pool(light: PointLight2D) -> void:
+	light.enabled = false
+
+
+## Update mycelium growth over time
+func _update_growth(delta: float) -> void:
+	growth_timer += delta
+
+	if growth_timer >= growth_interval:
+		growth_timer = 0.0
+		_perform_growth_tick()
+
+
+## Perform one growth cycle
+func _perform_growth_tick() -> void:
+	if active_growth_frontier.is_empty():
+		return
+
+	var tiles_spread_this_tick = 0
+	var new_frontier: Array[Vector2i] = []
+
+	# Shuffle frontier for randomness
+	active_growth_frontier.shuffle()
+
+	for tile_pos in active_growth_frontier:
+		if tiles_spread_this_tick >= max_spread_per_tick:
+			# Keep remaining tiles for next tick
+			new_frontier.append(tile_pos)
+			continue
+
+		# Try to spread to neighbors
+		var neighbors = _get_empty_neighbors(tile_pos)
+
+		if neighbors.is_empty():
+			# This tile can't spread anymore
+			continue
+
+		# Pick random neighbor to spread to
+		neighbors.shuffle()
+		for neighbor in neighbors:
+			if randf() < spread_chance:
+				_place_mycelium_at(neighbor, false)  # Free growth (no cost)
+				mycelium_spread.emit(neighbor)
+				tiles_spread_this_tick += 1
+				break
+
+		# If tile still has potential to spread, keep in frontier
+		if not _get_empty_neighbors(tile_pos).is_empty():
+			new_frontier.append(tile_pos)
+
+	active_growth_frontier = new_frontier
+
+
+## Get empty neighbors that can be spread to
+func _get_empty_neighbors(grid_pos: Vector2i) -> Array[Vector2i]:
+	var neighbors: Array[Vector2i] = []
+	var directions = [
+		Vector2i(1, 0),
+		Vector2i(-1, 0),
+		Vector2i(0, 1),
+		Vector2i(0, -1)
+	]
+
+	for dir in directions:
+		var neighbor_pos = grid_pos + dir
+
+		# Check if position is valid and empty
+		if _can_place_mycelium_at(neighbor_pos):
+			neighbors.append(neighbor_pos)
+
+	return neighbors
+
+
+## Check if mycelium can be placed at position
+func _can_place_mycelium_at(grid_pos: Vector2i) -> bool:
+	# Already has mycelium
+	if mycelium_tiles.has(grid_pos):
+		return false
+
+	# Check if cave tile is empty (not a wall)
+	if cave_world:
+		var world_pos = mycelium_layer.map_to_local(grid_pos)
+		var tile_type = cave_world.get_tile_at_position(world_pos)
+
+		# Can only place on empty tiles
+		if tile_type != CaveWorld.TileType.EMPTY:
+			return false
+
+	return true
+
+
+## Place mycelium at grid position (user or growth)
+func place_mycelium(world_pos: Vector2) -> bool:
+	var grid_pos = mycelium_layer.local_to_map(world_pos)
+
+	# Check if can place
+	if not _can_place_mycelium_at(grid_pos):
+		return false
+
+	# Check resource cost
+	if current_nutrients < initial_placement_cost:
+		print("Not enough nutrients! Need: %d, Have: %d" % [initial_placement_cost, current_nutrients])
+		return false
+
+	# Deduct cost
+	current_nutrients -= initial_placement_cost
+	nutrients_changed.emit(current_nutrients, starting_nutrients)
+
+	# Place mycelium
+	_place_mycelium_at(grid_pos, true)
+	mycelium_placed.emit(grid_pos)
+
+	return true
+
+
+## Internal placement logic
+func _place_mycelium_at(grid_pos: Vector2i, with_particles: bool = true) -> void:
+	# Add to tracking
+	mycelium_tiles[grid_pos] = 0  # Growth stage 0
+	active_growth_frontier.append(grid_pos)
+
+	# Place tile
+	mycelium_layer.set_cell(grid_pos, TILESET_SOURCE_ID, MYCELIUM_BASE)
+
+	# Add glow light
+	if enable_glow:
+		_add_light_at(grid_pos)
+
+	# Spawn particles
+	if with_particles:
+		_spawn_placement_particles(grid_pos)
+
+
+## Add dynamic light at tile position
+func _add_light_at(grid_pos: Vector2i) -> void:
+	var light = _get_light_from_pool()
+	light.position = mycelium_layer.map_to_local(grid_pos)
+	light.enabled = true
+	active_lights[grid_pos] = light
+
+
+## Remove light at position
+func _remove_light_at(grid_pos: Vector2i) -> void:
+	if active_lights.has(grid_pos):
+		var light = active_lights[grid_pos]
+		_return_light_to_pool(light)
+		active_lights.erase(grid_pos)
+
+
+## Spawn particles for mycelium placement
+func _spawn_placement_particles(grid_pos: Vector2i) -> void:
+	var particles = GPUParticles2D.new()
+	particles.position = mycelium_layer.map_to_local(grid_pos)
+	particles.amount = particle_amount
+	particles.lifetime = 1.0
+	particles.one_shot = true
+	particles.explosiveness = 0.8
+
+	# Create particle material
+	var particle_material = ParticleProcessMaterial.new()
+	particle_material.particle_flag_disable_z = true
+	particle_material.direction = Vector3(0, -1, 0)
+	particle_material.spread = 180.0
+	particle_material.initial_velocity_min = 20.0
+	particle_material.initial_velocity_max = 40.0
+	particle_material.gravity = Vector3(0, 20, 0)
+	particle_material.scale_min = 1.0
+	particle_material.scale_max = 3.0
+	particle_material.color = Color(0.0, 1.0, 1.0, 1.0)  # Cyan
+
+	particles.process_material = particle_material
+	particles.emitting = true
+
+	add_child(particles)
+
+	# Auto-delete after lifetime
+	await get_tree().create_timer(particles.lifetime + 0.5).timeout
+	particles.queue_free()
+
+
+## Remove mycelium at position (for destruction)
+func remove_mycelium_at(world_pos: Vector2) -> bool:
+	var grid_pos = mycelium_layer.local_to_map(world_pos)
+
+	if not mycelium_tiles.has(grid_pos):
+		return false
+
+	# Remove from tracking
+	mycelium_tiles.erase(grid_pos)
+	active_growth_frontier.erase(grid_pos)
+
+	# Remove tile
+	mycelium_layer.erase_cell(grid_pos)
+
+	# Remove light
+	_remove_light_at(grid_pos)
+
+	return true
+
+
+## Clear all mycelium from the map
+func clear_all() -> void:
+	# Clear visual tiles
+	mycelium_layer.clear()
+
+	# Clear tracking data
+	mycelium_tiles.clear()
+	active_growth_frontier.clear()
+
+	# Return all active lights to the pool by iterating over a copy of the keys.
+	# This prevents issues with modifying the dictionary while iterating over it.
+	var light_positions = active_lights.keys()
+	for grid_pos in light_positions:
+		_remove_light_at(grid_pos)
+	
+	active_lights.clear()
+
+
+## Check if position has mycelium
+func has_mycelium_at(world_pos: Vector2) -> bool:
+	var grid_pos = mycelium_layer.local_to_map(world_pos)
+	return mycelium_tiles.has(grid_pos)
+
+
+## Get total mycelium coverage
+func get_mycelium_count() -> int:
+	return mycelium_tiles.size()
+
+
+## Add nutrients (from harvesting, events, etc.)
+func add_nutrients(amount: int) -> void:
+	current_nutrients += amount
+	nutrients_changed.emit(current_nutrients, starting_nutrients)

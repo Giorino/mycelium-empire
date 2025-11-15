@@ -9,6 +9,8 @@ extends Node2D
 # Node references
 @onready var cave_generator: Node = $CaveGenerator
 @onready var tile_layer: TileMapLayer = $TileMapLayer
+@onready var mycelium_manager: Node = $MyceliumManager
+
 
 # Tile types (matching CaveGenerator.TileType enum)
 enum TileType {
@@ -33,6 +35,10 @@ func _ready() -> void:
 ## Generate a new cave and render it
 func generate_new_cave() -> void:
 	print("Generating new cave...")
+
+	# Clear existing mycelium before generating a new cave
+	if mycelium_manager:
+		mycelium_manager.clear_all()
 
 	var start_time = Time.get_ticks_msec()
 

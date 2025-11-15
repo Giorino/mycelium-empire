@@ -1,8 +1,10 @@
-[gd_scene load_steps=4 format=3 uid="uid://djy5m8n3k2qwp"]
+[gd_scene load_steps=6 format=3 uid="uid://djy5m8n3k2qwp"]
 
 [ext_resource type="Script" path="res://scripts/generation/cave_world.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/generation/cave_generator.gd" id="2"]
 [ext_resource type="TileSet" uid="uid://cvu7x2h8n5qfp" path="res://resources/tilesets/cave_tileset.tres" id="3"]
+[ext_resource type="Script" path="res://scripts/systems/mycelium_manager.gd" id="4"]
+[ext_resource type="TileSet" uid="uid://xp231867npb4" path="res://resources/tilesets/mycelium_tileset.tres" id="5"]
 
 [node name="CaveWorld" type="Node2D"]
 script = ExtResource("1")
@@ -26,6 +28,13 @@ min_open_area_size = 20
 [node name="TileMapLayer" type="TileMapLayer" parent="."]
 tile_set = ExtResource("3")
 
-[node name="CaveWorld" type="Node2D" parent="."]
+[node name="MyceliumManager" type="Node2D" parent="."]
+script = ExtResource("4")
+growth_interval = 2.0
+spread_chance = 0.7
+max_spread_per_tick = 3
+initial_placement_cost = 10
+starting_nutrients = 50
 
-[editable path="CaveWorld"]
+[node name="MyceliumLayer" type="TileMapLayer" parent="MyceliumManager"]
+tile_set = ExtResource("5")
