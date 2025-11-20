@@ -10,23 +10,36 @@ extends Node
 # Input state
 var mouse_world_pos: Vector2
 
+# Building state
+var is_build_mode: bool = false
+var selected_building: Resource = preload("res://resources/buildings/spore_pod.tres")
+var mother_egg_resource: Resource = preload("res://resources/buildings/mother_egg.tres")
+
+# Game State
+var is_game_started: bool = false
+
+@onready var building_manager: Node = get_node("../CaveWorld/BuildingManager")
+
 
 func _ready() -> void:
 	if not mycelium_manager:
 		push_error("PlayerInput: MyceliumManager not found!")
 	if not camera:
 		push_error("PlayerInput: Camera2D not found!")
+		
+	# Start game in "Place Mother Egg" mode
+	_start_game_placement()
+
+func _start_game_placement() -> void:
+	print("GAME START: Place your Mother Egg!")
+	is_build_mode = true
+	selected_building = mother_egg_resource
+	is_game_started = false # Will be set to true after egg placement
 
 
 func _process(_delta: float) -> void:
 	_update_mouse_position()
 
-
-# Building state
-var is_build_mode: bool = false
-var selected_building: Resource = preload("res://resources/buildings/spore_pod.tres")
-
-@onready var building_manager: Node = get_node("../CaveWorld/BuildingManager")
 
 func _input(event: InputEvent) -> void:
 	# Toggle build mode
@@ -39,8 +52,9 @@ func _input(event: InputEvent) -> void:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			if is_build_mode:
 				_handle_building_placement()
-			else:
-				_handle_mycelium_placement()
+			# Direct mycelium placement removed as per design change
+			# else:
+			# 	_handle_mycelium_placement()
 		elif event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 			_handle_harvesting()
 	
@@ -54,12 +68,36 @@ func _handle_building_placement() -> void:
 	if not building_manager:
 		return
 		
+	# Special check for Mother Egg (Game Start)
+	if not is_game_started:
+		if selected_building.id == "mother_egg":
+			# Mother Egg can be placed anywhere (doesn't need Mycelium)
+			# But we need to hack the BuildingManager or MyceliumManager to allow it?
+			# Actually, let's just place some initial mycelium UNDER the egg automatically.
+			
+			# 1. Place Mycelium at this spot (free)
+			if mycelium_manager:
+				mycelium_manager.place_mycelium(mouse_world_pos, true) # Ignore cost for Mother Egg base
+				# Force place? MyceliumManager checks cost. 
+				# Let's give player some starting nutrients to cover it, or make a force function.
+				# For now, let's assume starting nutrients cover it.
+			
+			# 2. Place Egg
+			var success = building_manager.place_building(mouse_world_pos, selected_building)
+			
+			if success:
+				print("Mother Egg placed! Game Started.")
+				is_game_started = true
+				is_build_mode = false # Exit build mode
+				selected_building = preload("res://resources/buildings/spore_pod.tres") # Reset to default
+		return
+
 	var success = building_manager.place_building(mouse_world_pos, selected_building)
 	
 	if success:
 		print("Placed building!")
 	else:
-		print("Cannot place building here (Need Mycelium + 50 Nutrients)")
+		print("Cannot place building here (Need Mycelium + Nutrients + Limit Check)")
 
 
 ## Update mouse world position

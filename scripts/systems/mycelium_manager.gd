@@ -45,6 +45,7 @@ var active_growth_frontier: Array[Vector2i] = []  # Tiles that can spread
 
 # Resources
 var current_nutrients: int = 0
+var max_nutrients: int = 0 # Determined by buildings (starts at 0)
 
 # Light pool for performance
 var light_pool: Array[PointLight2D] = []
@@ -222,7 +223,7 @@ func _can_place_mycelium_at(grid_pos: Vector2i) -> bool:
 
 
 ## Place mycelium at grid position (user or growth)
-func place_mycelium(world_pos: Vector2) -> bool:
+func place_mycelium(world_pos: Vector2, ignore_cost: bool = false) -> bool:
 	var grid_pos = mycelium_layer.local_to_map(world_pos)
 
 	# Check if can place
@@ -230,13 +231,14 @@ func place_mycelium(world_pos: Vector2) -> bool:
 		return false
 
 	# Check resource cost
-	if current_nutrients < initial_placement_cost:
-		print("Not enough nutrients! Need: %d, Have: %d" % [initial_placement_cost, current_nutrients])
-		return false
+	if not ignore_cost:
+		if current_nutrients < initial_placement_cost:
+			print("Not enough nutrients! Need: %d, Have: %d" % [initial_placement_cost, current_nutrients])
+			return false
 
-	# Deduct cost
-	current_nutrients -= initial_placement_cost
-	nutrients_changed.emit(current_nutrients, starting_nutrients)
+		# Deduct cost
+		current_nutrients -= initial_placement_cost
+		nutrients_changed.emit(current_nutrients, starting_nutrients)
 
 	# Place mycelium
 	_place_mycelium_at(grid_pos, true)
@@ -426,4 +428,17 @@ func get_mycelium_count() -> int:
 ## Add nutrients (from harvesting, events, etc.)
 func add_nutrients(amount: int) -> void:
 	current_nutrients += amount
-	nutrients_changed.emit(current_nutrients, starting_nutrients)
+	
+	# Cap at max_nutrients (unless max is 0, which shouldn't happen after game start)
+	if max_nutrients > 0 and current_nutrients > max_nutrients:
+		current_nutrients = max_nutrients
+		
+	nutrients_changed.emit(current_nutrients, max_nutrients)
+
+## Update max nutrients
+func update_max_nutrients(new_max: int) -> void:
+	max_nutrients = new_max
+	# Clamp current if it exceeds new max
+	if current_nutrients > max_nutrients:
+		current_nutrients = max_nutrients
+	nutrients_changed.emit(current_nutrients, max_nutrients)

@@ -10,4 +10,5 @@ name = "Spore Pod"
 description = "A living structure that houses minions. Increases population cap."
 scene = ExtResource("2")
 nutrient_cost = 50
+nutrient_generation_rate = 1
 growth_time = 5.0

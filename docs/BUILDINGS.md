@@ -4,8 +4,15 @@ In *Mycelium Empire*, buildings are not constructed but *grown*. They must be pl
 
 ## Core Structures
 
+### 0. Mother Egg (HQ)
+*   **Function**: The heart of the colony. Stores 500 Nutrients. Spawns initial Mycelium.
+*   **Cost**: 0 Nutrients (Free, placed at game start).
+*   **Limit**: 1 per game (Unique).
+*   **Description**: A massive, pulsating egg shrouded in bioluminescent cyan light. The origin point of your fungal empire.
+*   **Notes**: Must be placed first to start the game. Cannot be destroyed. All other buildings require existing Mycelium to be placed.
+
 ### 1. Spore Pod (Housing)
-*   **Function**: Increases maximum Minion Population cap.
+*   **Function**: Increases maximum Minion Population cap. Generates 1 Nutrient/sec.
 *   **Cost**: 50 Nutrients.
 *   **Description**: A pulsating sack of translucent membrane. Inside, new life curls in wait.
 *   **Upgrades**:

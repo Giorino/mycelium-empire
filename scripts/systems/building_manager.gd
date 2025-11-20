@@ -11,6 +11,31 @@ signal building_placed(building_instance: Node2D, grid_pos: Vector2i)
 
 # State
 var buildings: Dictionary = {} # Vector2i -> Node2D
+var building_data_map: Dictionary = {} # Vector2i -> Resource (BuildingData)
+var generation_timer: float = 0.0
+var generation_interval: float = 1.0 # Generate every second
+
+func _process(delta: float) -> void:
+	_handle_resource_generation(delta)
+
+func _handle_resource_generation(delta: float) -> void:
+	if not mycelium_manager:
+		return
+		
+	generation_timer += delta
+	if generation_timer >= generation_interval:
+		generation_timer = 0.0
+		
+		var total_generated = 0
+		for grid_pos in building_data_map:
+			var data = building_data_map[grid_pos]
+			if data.get("nutrient_generation_rate") > 0:
+				total_generated += data.nutrient_generation_rate
+				
+		if total_generated > 0:
+			mycelium_manager.add_nutrients(total_generated)
+			# Optional: Show popup text for generation?
+
 
 func _ready() -> void:
 	if not mycelium_manager:
@@ -35,7 +60,37 @@ func can_place_building(world_pos: Vector2, building_data: Resource) -> bool:
 	if mycelium_manager.current_nutrients < building_data.nutrient_cost:
 		return false
 		
+	# 4. Check build limit
+	if building_data.build_limit > 0:
+		var count = 0
+		for pos in building_data_map:
+			if building_data_map[pos].id == building_data.id:
+				count += 1
+		
+		if count >= building_data.build_limit:
+			print("Build limit reached for %s" % building_data.name)
+			return false
+			
 	return true
+
+## Calculate total storage capacity from all buildings
+func _update_storage_capacity() -> void:
+	if not mycelium_manager:
+		return
+		
+	var total_storage = 0
+	for pos in building_data_map:
+		var data = building_data_map[pos]
+		if data.get("storage_capacity") > 0:
+			total_storage += data.storage_capacity
+			
+	# If no storage buildings, keep a small base amount (e.g. 50) or 0?
+	# Let's say base is 50.
+	if total_storage == 0:
+		total_storage = 50
+		
+	if mycelium_manager.has_method("update_max_nutrients"):
+		mycelium_manager.update_max_nutrients(total_storage)
 
 ## Place a building at the given world position
 func place_building(world_pos: Vector2, building_data: Resource) -> bool:
@@ -54,8 +109,11 @@ func place_building(world_pos: Vector2, building_data: Resource) -> bool:
 	
 	# Track building
 	buildings[grid_pos] = building_instance
+	building_data_map[grid_pos] = building_data
 	
 	emit_signal("building_placed", building_instance, grid_pos)
 	print("Placed building: %s at %v" % [building_data.name, grid_pos])
+	
+	_update_storage_capacity()
 	
 	return true

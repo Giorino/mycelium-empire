@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://b8lal0m1n2o3p"]
+
+[ext_resource type="Texture2D" uid="uid://d4e5f6g7h8i9j" path="res://assets/sprites/mother_egg.png" id="1"]
+
+[node name="MotherEgg" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1")
+offset = Vector2(0, -8)

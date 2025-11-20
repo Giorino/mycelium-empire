@@ -25,4 +25,9 @@ The visual style is critical.
 ## Agent Guidelines
 1.  **Art First**: Always consider the "Bioluminescent Noir" aesthetic. If generating assets or UI, ensure high contrast and neon accents.
 2.  **Godot Best Practices**: Use strict typing in GDScript (`@export var`, `func _ready() -> void:`).
-3.  **Documentation**: Keep `CLAUDE.md` and `README.md` in mind, but this file is your primary anchor.
+29.  **Documentation**: Keep `CLAUDE.md` and `README.md` in mind, but this file is your primary anchor.
+
+## Useful Scripts
+### Asset Processor (`scripts/tools/asset_processor.gd`)
+Use this script to process generated pixel art assets (remove background, resize to 32x32).
+Run with: `/Applications/Godot.app/Contents/MacOS/Godot --headless --script scripts/tools/asset_processor.gd`
