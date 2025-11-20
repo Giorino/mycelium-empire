@@ -203,7 +203,8 @@ func harvest_tile_at_position(world_pos: Vector2) -> bool:
 	# Add resources to mycelium manager
 	if mycelium_manager:
 		mycelium_manager.add_nutrients(nutrient_gain)
-		print("Gained %d nutrients from harvest!" % nutrient_gain)
+		ExperienceManager.add_xp(float(nutrient_gain))
+		print("Gained %d nutrients and XP from harvest!" % nutrient_gain)
 
 	# Spawn destruction particles
 	_spawn_destruction_particles(world_pos)

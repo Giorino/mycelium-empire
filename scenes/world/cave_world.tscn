@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://djy5m8n3k2qwp"]
+[gd_scene load_steps=10 format=3 uid="uid://djy5m8n3k2qwp"]
 
 [ext_resource type="Script" uid="uid://ctxysu7wf5iw4" path="res://scripts/generation/cave_world.gd" id="1"]
 [ext_resource type="Script" uid="uid://146fjqtp526e" path="res://scripts/generation/cave_generator.gd" id="2"]
@@ -7,6 +7,15 @@
 [ext_resource type="TileSet" uid="uid://bhgdnj34r7hem" path="res://resources/tilesets/mycelium_tileset.tres" id="5"]
 [ext_resource type="Script" uid="uid://e07vlk7ytq3h" path="res://scripts/systems/minion_manager.gd" id="6"]
 [ext_resource type="PackedScene" path="res://scenes/entities/minion.tscn" id="7"]
+[ext_resource type="Shader" path="res://resources/shaders/mycelium_glow.gdshader" id="8"]
+[ext_resource type="Script" path="res://scripts/systems/building_manager.gd" id="9"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1"]
+shader = ExtResource("8")
+shader_parameter/pulse_speed = 1.5
+shader_parameter/pulse_strength = 0.3
+shader_parameter/glow_color = Color(0, 1, 1, 1)
+shader_parameter/brightness_boost = 1.5
 
 [node name="CaveWorld" type="Node2D"]
 script = ExtResource("1")
@@ -21,7 +30,11 @@ tile_set = ExtResource("3")
 script = ExtResource("4")
 
 [node name="MyceliumLayer" type="TileMapLayer" parent="MyceliumManager"]
+material = SubResource("ShaderMaterial_1")
 tile_set = ExtResource("5")
+
+[node name="BuildingManager" type="Node2D" parent="."]
+script = ExtResource("9")
 
 [node name="MinionManager" type="Node2D" parent="."]
 script = ExtResource("6")

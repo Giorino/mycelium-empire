@@ -13,7 +13,8 @@ void fragment() {
 	vec4 tex_color = texture(TEXTURE, UV);
 
 	// Create pulsing effect using sine wave
-	float pulse = sin(TIME * pulse_speed) * 0.5 + 0.5;  // Oscillates 0-1
+	// Create pulsing effect using sine wave
+	float pulse = (sin(TIME * pulse_speed) + sin(TIME * pulse_speed * 0.7 + 2.0) * 0.5) * 0.33 + 0.5;  // Organic wobble
 
 	// Apply pulse to brightness
 	float glow_intensity = 1.0 + (pulse * pulse_strength);

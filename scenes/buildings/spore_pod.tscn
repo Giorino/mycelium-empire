@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://d3k4l5m6n7o8p"]
+
+[ext_resource type="Texture2D" uid="uid://c2k3l4m5n6o7p" path="res://assets/sprites/placeholder_spore_pod.png" id="1"]
+
+[node name="SporePod" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1")
+offset = Vector2(0, -8)

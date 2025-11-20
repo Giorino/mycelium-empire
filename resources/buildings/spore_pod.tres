@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BuildingData" load_steps=3 format=3 uid="uid://e4k5l6m7n8o9p"]
+
+[ext_resource type="Script" path="res://scripts/resources/building_data.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://d3k4l5m6n7o8p" path="res://scenes/buildings/spore_pod.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = "spore_pod"
+name = "Spore Pod"
+description = "A living structure that houses minions. Increases population cap."
+scene = ExtResource("2")
+nutrient_cost = 50
+growth_time = 5.0

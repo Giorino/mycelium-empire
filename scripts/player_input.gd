@@ -22,13 +22,44 @@ func _process(_delta: float) -> void:
 	_update_mouse_position()
 
 
+# Building state
+var is_build_mode: bool = false
+var selected_building: Resource = preload("res://resources/buildings/spore_pod.tres")
+
+@onready var building_manager: Node = get_node("../CaveWorld/BuildingManager")
+
 func _input(event: InputEvent) -> void:
+	# Toggle build mode
+	if event is InputEventKey and event.pressed and event.keycode == KEY_B:
+		is_build_mode = !is_build_mode
+		print("Build Mode: %s" % is_build_mode)
+		
 	# Handle mouse clicks
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			_handle_mycelium_placement()
+			if is_build_mode:
+				_handle_building_placement()
+			else:
+				_handle_mycelium_placement()
 		elif event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 			_handle_harvesting()
+	
+	# Debug shortcuts
+	if event is InputEventKey and event.pressed and event.keycode == KEY_L:
+		print("Debug: Adding 100 XP")
+		ExperienceManager.add_xp(100.0)
+
+## Handle building placement
+func _handle_building_placement() -> void:
+	if not building_manager:
+		return
+		
+	var success = building_manager.place_building(mouse_world_pos, selected_building)
+	
+	if success:
+		print("Placed building!")
+	else:
+		print("Cannot place building here (Need Mycelium + 50 Nutrients)")
 
 
 ## Update mouse world position

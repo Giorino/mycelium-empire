@@ -3,6 +3,7 @@ extends Control
 ## Manages in-game UI display and updates
 
 @onready var nutrient_label: Label = $ResourceDisplay/NutrientLabel
+@onready var xp_bar: ProgressBar = $XPBar
 @onready var mycelium_manager: Node = get_node("/root/Main/CaveWorld/MyceliumManager")
 
 
@@ -13,8 +14,18 @@ func _ready() -> void:
 		_on_nutrients_changed(mycelium_manager.current_nutrients, mycelium_manager.starting_nutrients)
 	else:
 		push_error("GameUI: Could not find MyceliumManager!")
+	
+	# Connect to ExperienceManager
+	ExperienceManager.xp_gained.connect(_on_xp_gained)
+	_on_xp_gained(ExperienceManager.current_xp, ExperienceManager.target_xp)
 
 
 func _on_nutrients_changed(current: int, _max: int) -> void:
 	if nutrient_label:
 		nutrient_label.text = "Nutrients: %d" % current
+
+
+func _on_xp_gained(current: float, target: float) -> void:
+	if xp_bar:
+		xp_bar.max_value = target
+		xp_bar.value = current
