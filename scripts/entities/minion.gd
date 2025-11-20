@@ -25,11 +25,13 @@ enum State {
 @export var max_hunger: float = 100.0
 @export var hunger_rate: float = 1.0  # Hunger per second
 @export var starvation_threshold: float = 20.0
-@export var harvest_duration: float = 2.0  # Seconds to harvest one tile
+@export var harvest_duration: float = 10.0  # Seconds to harvest one tile
 
 @export_group("Behavior")
 @export var sight_range: float = 200.0
 @export var nutrient_per_harvest: int = 20  # How much colony gains per harvest
+@export var upkeep_interval: float = 8.0  # Seconds between upkeep consumption
+@export var upkeep_cost: int = 10  # Nutrients consumed per upkeep tick
 
 # State
 var current_state: State = State.IDLE
@@ -40,6 +42,7 @@ var is_alive: bool = true
 var target_position: Vector2 = Vector2.ZERO
 var target_nutrient_tile: Vector2i = Vector2i(-999, -999)
 var harvest_timer: float = 0.0
+var upkeep_timer: float = 0.0
 
 # References
 var cave_world: Node = null
@@ -105,19 +108,43 @@ func _physics_process(_delta: float) -> void:
 	move_and_slide()
 
 
-## Update hunger over time
+## Update hunger and upkeep over time
 func _update_hunger(delta: float) -> void:
-	hunger += hunger_rate * delta
-
+	# Increment upkeep timer
+	upkeep_timer += delta
+	
+	# Check if upkeep is due
+	if upkeep_timer >= upkeep_interval:
+		upkeep_timer = 0.0
+		_consume_upkeep()
+	
+	# Hunger still increases over time (slower than before)
+	hunger += hunger_rate * delta * 0.5  # 50% slower hunger increase
+	
 	# Clamp hunger
 	hunger = clamp(hunger, 0, max_hunger)
-
+	
 	# Check starvation
 	if hunger >= max_hunger:
 		_die("starvation")
-	# Only interrupt IDLE state when hungry - don't interrupt food-seeking behaviors
-	elif hunger >= starvation_threshold and current_state == State.IDLE:
-		_change_state(State.SEEKING_NUTRIENT)
+
+## Consume nutrients from global pool for upkeep
+func _consume_upkeep() -> void:
+	if not mycelium_manager:
+		hunger += 20.0  # Penalty if no manager
+		return
+	
+	# Try to consume from global pool
+	if mycelium_manager.current_nutrients >= upkeep_cost:
+		# Success - deduct nutrients and reduce hunger
+		mycelium_manager.current_nutrients -= upkeep_cost
+		mycelium_manager.nutrients_changed.emit(mycelium_manager.current_nutrients, mycelium_manager.max_nutrients)
+		hunger = max(0, hunger - 40.0)  # Fed well
+		print("Minion consumed %d nutrients (hunger: %.1f)" % [upkeep_cost, hunger])
+	else:
+		# Failed - increase hunger (starvation)
+		hunger += 30.0
+		print("Minion starving! Not enough nutrients in pool (hunger: %.1f)" % hunger)
 
 
 ## Update FSM
@@ -133,11 +160,12 @@ func _update_state(delta: float) -> void:
 			_state_harvesting(delta)
 
 
-## IDLE: Wander around on mycelium
+## IDLE: Actively seek nutrients (not passive anymore)
 func _state_idle(_delta: float) -> void:
-	# Hunger check is handled in _update_hunger to avoid duplication
-	# Just stay idle - don't wander (saves on pathfinding)
-	velocity = Vector2.ZERO
+	# Always try to find work (nutrients to harvest)
+	# Small delay before seeking again to prevent constant state switching
+	if randf() < 0.02:  # ~2% chance per frame = ~1 check per second at 60fps
+		_change_state(State.SEEKING_NUTRIENT)
 
 
 ## SEEKING_NUTRIENT: Look for nearby nutrient veins
