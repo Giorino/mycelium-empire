@@ -4,6 +4,7 @@ extends Node
 
 # Node references
 @onready var mycelium_manager: Node = get_node("../CaveWorld/MyceliumManager")
+@onready var cave_world: Node = get_node("../CaveWorld")
 @onready var camera: Camera2D = get_node("../Camera2D")
 
 # Input state
@@ -22,10 +23,12 @@ func _process(_delta: float) -> void:
 
 
 func _input(event: InputEvent) -> void:
-	# Handle mouse clicks for mycelium placement
+	# Handle mouse clicks
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			_handle_mycelium_placement()
+		elif event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+			_handle_harvesting()
 
 
 ## Update mouse world position
@@ -45,3 +48,16 @@ func _handle_mycelium_placement() -> void:
 		print("Mycelium placed at: %v" % mouse_world_pos)
 	else:
 		print("Cannot place mycelium at: %v" % mouse_world_pos)
+
+
+## Handle harvesting nutrient tiles
+func _handle_harvesting() -> void:
+	if not cave_world:
+		return
+
+	var success = cave_world.harvest_tile_at_position(mouse_world_pos)
+
+	if success:
+		print("Harvested tile at: %v" % mouse_world_pos)
+	else:
+		print("Nothing to harvest at: %v" % mouse_world_pos)

@@ -1,18 +1,18 @@
-[gd_scene load_steps=7 format=3 uid="uid://b8j3n4m5k6p7q8r9"]
+[gd_scene load_steps=7 format=3 uid="uid://vp5wjvvm1els"]
 
 [ext_resource type="PackedScene" uid="uid://djy5m8n3k2qwp" path="res://scenes/world/cave_world.tscn" id="1"]
-[ext_resource type="Script" path="res://scripts/camera_controller.gd" id="2"]
-[ext_resource type="Script" path="res://scripts/player_input.gd" id="3"]
-[ext_resource type="Script" path="res://scripts/ui/game_ui.gd" id="4"]
+[ext_resource type="Script" uid="uid://b7erku1bsokx2" path="res://scripts/camera_controller.gd" id="2"]
+[ext_resource type="Script" uid="uid://dcsyloufxbryf" path="res://scripts/player_input.gd" id="3"]
+[ext_resource type="Script" uid="uid://cu1bu8lo3wa2e" path="res://scripts/ui/game_ui.gd" id="4"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_1"]
-font_size = 20
+font_size = 36
 font_color = Color(0, 1, 1, 1)
 outline_size = 4
 outline_color = Color(0, 0, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_2"]
-font_size = 14
+font_size = 36
 font_color = Color(0.7, 0.7, 0.7, 1)
 outline_size = 2
 outline_color = Color(0, 0, 0, 1)
@@ -59,6 +59,7 @@ offset_top = 90.0
 offset_right = 400.0
 offset_bottom = 150.0
 text = "LEFT CLICK: Place Mycelium (10 nutrients)
+RIGHT CLICK: Harvest Nutrients (15-25 gain)
 R: Regenerate Cave
 WASD: Move Camera"
 label_settings = SubResource("LabelSettings_2")

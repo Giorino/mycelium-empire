@@ -19,19 +19,24 @@ signal nutrients_changed(current: int, max: int)
 
 @export_group("Visual Settings")
 @export var enable_glow: bool = true
-@export var glow_energy: float = 1.5
-@export var glow_radius: float = 32.0
+@export var glow_energy: float = 0.1 # 1.5
+@export var glow_radius: float = 20.0 # 32.0
 @export var particle_amount: int = 16
 
 # References
 @onready var mycelium_layer: TileMapLayer = $MyceliumLayer
 @onready var cave_world: Node = get_parent()
 
-# Tile atlas coordinates
-const MYCELIUM_BASE = Vector2i(0, 0)
-const MYCELIUM_GROWTH = Vector2i(1, 0)
-const MYCELIUM_DENSE = Vector2i(2, 0)
+# Tile atlas coordinates - Connected mycelium veins use bitmask autotiling
+# Bitmask: UP=1, RIGHT=2, DOWN=4, LEFT=8
+const MYCELIUM_TILE_START = Vector2i(0, 0)  # First tile in connected set
 const TILESET_SOURCE_ID = 0
+
+# Bitmask values for mycelium connections
+const CONNECT_UP = 1
+const CONNECT_RIGHT = 2
+const CONNECT_DOWN = 4
+const CONNECT_LEFT = 8
 
 # Growth tracking
 var growth_timer: float = 0.0
@@ -50,10 +55,31 @@ func _ready() -> void:
 	current_nutrients = starting_nutrients
 	nutrients_changed.emit(current_nutrients, starting_nutrients)
 	_initialize_light_pool()
+	_apply_glow_shader()
 
 
 func _process(delta: float) -> void:
 	_update_growth(delta)
+
+
+## Apply pulsing glow shader to mycelium layer
+func _apply_glow_shader() -> void:
+	if not mycelium_layer:
+		return
+
+	# Load shader
+	var shader = load("res://resources/shaders/mycelium_glow.gdshader")
+	if shader:
+		var material = ShaderMaterial.new()
+		material.shader = shader
+		# Set shader parameters
+		material.set_shader_parameter("pulse_speed", 1.5)
+		material.set_shader_parameter("pulse_strength", 0.25)
+		material.set_shader_parameter("glow_color", Color(0.0, 1.0, 1.0, 1.0))
+		material.set_shader_parameter("brightness_boost", 1.8)
+
+		mycelium_layer.material = material
+		print("Mycelium glow shader applied!")
 
 
 ## Initialize pool of light nodes for performance
@@ -225,8 +251,15 @@ func _place_mycelium_at(grid_pos: Vector2i, with_particles: bool = true) -> void
 	mycelium_tiles[grid_pos] = 0  # Growth stage 0
 	active_growth_frontier.append(grid_pos)
 
+	# Calculate connected tile based on neighbors
+	var bitmask = _calculate_mycelium_bitmask(grid_pos)
+	var atlas_coord = Vector2i(MYCELIUM_TILE_START.x + bitmask, 0)
+
 	# Place tile
-	mycelium_layer.set_cell(grid_pos, TILESET_SOURCE_ID, MYCELIUM_BASE)
+	mycelium_layer.set_cell(grid_pos, TILESET_SOURCE_ID, atlas_coord)
+
+	# Update neighboring mycelium tiles to connect to this new one
+	_refresh_mycelium_neighbors(grid_pos)
 
 	# Add glow light
 	if enable_glow:
@@ -253,26 +286,80 @@ func _remove_light_at(grid_pos: Vector2i) -> void:
 		active_lights.erase(grid_pos)
 
 
-## Spawn particles for mycelium placement
+## Calculate bitmask for mycelium autotiling based on neighbors
+func _calculate_mycelium_bitmask(grid_pos: Vector2i) -> int:
+	var bitmask = 0
+
+	# Helper to check if a position has mycelium
+	var has_mycelium = func(pos: Vector2i) -> bool:
+		return mycelium_tiles.has(pos)
+
+	# Check each direction (UP, RIGHT, DOWN, LEFT)
+	if has_mycelium.call(grid_pos + Vector2i(0, -1)):  # UP
+		bitmask |= CONNECT_UP
+	if has_mycelium.call(grid_pos + Vector2i(1, 0)):   # RIGHT
+		bitmask |= CONNECT_RIGHT
+	if has_mycelium.call(grid_pos + Vector2i(0, 1)):   # DOWN
+		bitmask |= CONNECT_DOWN
+	if has_mycelium.call(grid_pos + Vector2i(-1, 0)):  # LEFT
+		bitmask |= CONNECT_LEFT
+
+	return bitmask
+
+
+## Refresh neighboring mycelium tiles after a new one is placed/removed
+func _refresh_mycelium_neighbors(center_pos: Vector2i) -> void:
+	# Check all 4 neighboring positions
+	var neighbors = [
+		center_pos + Vector2i(0, -1),  # UP
+		center_pos + Vector2i(1, 0),   # RIGHT
+		center_pos + Vector2i(0, 1),   # DOWN
+		center_pos + Vector2i(-1, 0)   # LEFT
+	]
+
+	for neighbor_pos in neighbors:
+		# Check if this neighbor has mycelium
+		if mycelium_tiles.has(neighbor_pos):
+			# Recalculate its bitmask and update the tile
+			var bitmask = _calculate_mycelium_bitmask(neighbor_pos)
+			var atlas_coord = Vector2i(MYCELIUM_TILE_START.x + bitmask, 0)
+			mycelium_layer.set_cell(neighbor_pos, TILESET_SOURCE_ID, atlas_coord)
+
+
+## Set starting nutrients to default
+func set_starting_nutrients_to_default() -> void:
+	current_nutrients = starting_nutrients
+	nutrients_changed.emit(current_nutrients, starting_nutrients)
+
+
+## Spawn particles for mycelium placement (growth burst effect)
 func _spawn_placement_particles(grid_pos: Vector2i) -> void:
 	var particles = GPUParticles2D.new()
 	particles.position = mycelium_layer.map_to_local(grid_pos)
-	particles.amount = particle_amount
-	particles.lifetime = 1.0
+	particles.amount = 32  # More particles for organic feel
+	particles.lifetime = 1.5  # Longer-lasting spore effect
 	particles.one_shot = true
-	particles.explosiveness = 0.8
+	particles.explosiveness = 0.5  # Less explosive, more organic spread
 
-	# Create particle material
+	# Create particle material for fuzzy spore effect
 	var particle_material = ParticleProcessMaterial.new()
 	particle_material.particle_flag_disable_z = true
-	particle_material.direction = Vector3(0, -1, 0)
-	particle_material.spread = 180.0
-	particle_material.initial_velocity_min = 20.0
-	particle_material.initial_velocity_max = 40.0
-	particle_material.gravity = Vector3(0, 20, 0)
-	particle_material.scale_min = 1.0
-	particle_material.scale_max = 3.0
-	particle_material.color = Color(0.0, 1.0, 1.0, 1.0)  # Cyan
+	particle_material.direction = Vector3(0, -1, 0)  # Float upward
+	particle_material.spread = 180.0  # Spread in all directions
+	particle_material.initial_velocity_min = 10.0  # Slower, gentler movement
+	particle_material.initial_velocity_max = 30.0
+	particle_material.gravity = Vector3(0, -15, 0)  # Float upward gently (negative gravity)
+	particle_material.angular_velocity_min = -45.0  # Gentle rotation
+	particle_material.angular_velocity_max = 45.0
+	particle_material.scale_min = 0.5  # Small fuzzy particles
+	particle_material.scale_max = 2.5
+	particle_material.color = Color(0.0, 1.0, 1.0, 0.8)  # Cyan with slight transparency
+
+	# Add variation with color ramp for fade out
+	var gradient = Gradient.new()
+	gradient.set_color(0, Color(0.5, 1.0, 1.0, 1.0))  # Bright cyan at start
+	gradient.set_color(1, Color(0.0, 0.8, 1.0, 0.0))  # Fade to transparent
+	particle_material.color_ramp = gradient
 
 	particles.process_material = particle_material
 	particles.emitting = true
@@ -300,6 +387,9 @@ func remove_mycelium_at(world_pos: Vector2) -> bool:
 
 	# Remove light
 	_remove_light_at(grid_pos)
+
+	# Update neighboring tiles to disconnect from this removed tile
+	_refresh_mycelium_neighbors(grid_pos)
 
 	return true
 

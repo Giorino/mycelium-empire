@@ -1,0 +1,149 @@
+<svg width="288" height="16" xmlns="http://www.w3.org/2000/svg">
+  <!-- Tile 0: Wall tile (dark grey rock) -->
+  <rect x="0" y="0" width="16" height="16" fill="#2a2a2a"/>
+  <rect x="2" y="2" width="12" height="12" fill="#3a3a3a"/>
+  <rect x="3" y="3" width="10" height="10" fill="#4a4a4a"/>
+
+  <!-- NUTRIENT VEIN TILES (Bitmask autotiling) -->
+  <!-- Padding: 2px from edges, thin organic lines (2px thick) -->
+  <!-- Bits: UP=1, RIGHT=2, DOWN=4, LEFT=8 -->
+
+  <!-- Tile 1 (index 0000=0): Isolated dot -->
+  <g transform="translate(16, 0)">
+    <rect width="16" height="16" fill="#1a2a2a"/>
+    <circle cx="8" cy="8" r="3" fill="#00aaaa" opacity="0.6"/>
+    <circle cx="8" cy="8" r="1.5" fill="#00ffff" opacity="0.8"/>
+  </g>
+
+  <!-- Tile 2 (index 0001=1): Connection UP only -->
+  <g transform="translate(32, 0)">
+    <rect width="16" height="16" fill="#1a2a2a"/>
+    <rect x="7" y="0" width="2" height="10" fill="#00aaaa" opacity="0.6"/>
+    <rect x="7.5" y="0" width="1" height="10" fill="#00ffff" opacity="0.8"/>
+    <circle cx="8" cy="10" r="2" fill="#00aaaa" opacity="0.6"/>
+  </g>
+
+  <!-- Tile 3 (index 0010=2): Connection RIGHT only -->
+  <g transform="translate(48, 0)">
+    <rect width="16" height="16" fill="#1a2a2a"/>
+    <rect x="6" y="7" width="10" height="2" fill="#00aaaa" opacity="0.6"/>
+    <rect x="6" y="7.5" width="10" height="1" fill="#00ffff" opacity="0.8"/>
+    <circle cx="6" cy="8" r="2" fill="#00aaaa" opacity="0.6"/>
+  </g>
+
+  <!-- Tile 4 (index 0011=3): Corner UP + RIGHT -->
+  <g transform="translate(64, 0)">
+    <rect width="16" height="16" fill="#1a2a2a"/>
+    <rect x="7" y="0" width="2" height="9" fill="#00aaaa" opacity="0.6"/>
+    <rect x="7" y="7" width="9" height="2" fill="#00aaaa" opacity="0.6"/>
+    <rect x="7.5" y="0" width="1" height="9" fill="#00ffff" opacity="0.8"/>
+    <rect x="7" y="7.5" width="9" height="1" fill="#00ffff" opacity="0.8"/>
+  </g>
+
+  <!-- Tile 5 (index 0100=4): Connection DOWN only -->
+  <g transform="translate(80, 0)">
+    <rect width="16" height="16" fill="#1a2a2a"/>
+    <rect x="7" y="6" width="2" height="10" fill="#00aaaa" opacity="0.6"/>
+    <rect x="7.5" y="6" width="1" height="10" fill="#00ffff" opacity="0.8"/>
+    <circle cx="8" cy="6" r="2" fill="#00aaaa" opacity="0.6"/>
+  </g>
+
+  <!-- Tile 6 (index 0101=5): Vertical line UP + DOWN -->
+  <g transform="translate(96, 0)">
+    <rect width="16" height="16" fill="#1a2a2a"/>
+    <rect x="7" y="0" width="2" height="16" fill="#00aaaa" opacity="0.6"/>
+    <rect x="7.5" y="0" width="1" height="16" fill="#00ffff" opacity="0.8"/>
+  </g>
+
+  <!-- Tile 7 (index 0110=6): Corner DOWN + RIGHT -->
+  <g transform="translate(112, 0)">
+    <rect width="16" height="16" fill="#1a2a2a"/>
+    <rect x="7" y="7" width="9" height="2" fill="#00aaaa" opacity="0.6"/>
+    <rect x="7" y="7" width="2" height="9" fill="#00aaaa" opacity="0.6"/>
+    <rect x="7.5" y="7" width="9" height="1" fill="#00ffff" opacity="0.8"/>
+    <rect x="7.5" y="7" width="1" height="9" fill="#00ffff" opacity="0.8"/>
+  </g>
+
+  <!-- Tile 8 (index 0111=7): T-junction UP + DOWN + RIGHT -->
+  <g transform="translate(128, 0)">
+    <rect width="16" height="16" fill="#1a2a2a"/>
+    <rect x="7" y="0" width="2" height="16" fill="#00aaaa" opacity="0.6"/>
+    <rect x="7" y="7" width="9" height="2" fill="#00aaaa" opacity="0.6"/>
+    <rect x="7.5" y="0" width="1" height="16" fill="#00ffff" opacity="0.8"/>
+    <rect x="7.5" y="7" width="9" height="1" fill="#00ffff" opacity="0.8"/>
+  </g>
+
+  <!-- Tile 9 (index 1000=8): Connection LEFT only -->
+  <g transform="translate(144, 0)">
+    <rect width="16" height="16" fill="#1a2a2a"/>
+    <rect x="0" y="7" width="10" height="2" fill="#00aaaa" opacity="0.6"/>
+    <rect x="0" y="7.5" width="10" height="1" fill="#00ffff" opacity="0.8"/>
+    <circle cx="10" cy="8" r="2" fill="#00aaaa" opacity="0.6"/>
+  </g>
+
+  <!-- Tile 10 (index 1001=9): Corner UP + LEFT -->
+  <g transform="translate(160, 0)">
+    <rect width="16" height="16" fill="#1a2a2a"/>
+    <rect x="7" y="0" width="2" height="9" fill="#00aaaa" opacity="0.6"/>
+    <rect x="0" y="7" width="9" height="2" fill="#00aaaa" opacity="0.6"/>
+    <rect x="7.5" y="0" width="1" height="9" fill="#00ffff" opacity="0.8"/>
+    <rect x="0" y="7.5" width="9" height="1" fill="#00ffff" opacity="0.8"/>
+  </g>
+
+  <!-- Tile 11 (index 1010=10): Horizontal line LEFT + RIGHT -->
+  <g transform="translate(176, 0)">
+    <rect width="16" height="16" fill="#1a2a2a"/>
+    <rect x="0" y="7" width="16" height="2" fill="#00aaaa" opacity="0.6"/>
+    <rect x="0" y="7.5" width="16" height="1" fill="#00ffff" opacity="0.8"/>
+  </g>
+
+  <!-- Tile 12 (index 1011=11): T-junction UP + LEFT + RIGHT -->
+  <g transform="translate(192, 0)">
+    <rect width="16" height="16" fill="#1a2a2a"/>
+    <rect x="0" y="7" width="16" height="2" fill="#00aaaa" opacity="0.6"/>
+    <rect x="7" y="0" width="2" height="9" fill="#00aaaa" opacity="0.6"/>
+    <rect x="0" y="7.5" width="16" height="1" fill="#00ffff" opacity="0.8"/>
+    <rect x="7.5" y="0" width="1" height="9" fill="#00ffff" opacity="0.8"/>
+  </g>
+
+  <!-- Tile 13 (index 1100=12): Corner DOWN + LEFT -->
+  <g transform="translate(208, 0)">
+    <rect width="16" height="16" fill="#1a2a2a"/>
+    <rect x="0" y="7" width="9" height="2" fill="#00aaaa" opacity="0.6"/>
+    <rect x="7" y="7" width="2" height="9" fill="#00aaaa" opacity="0.6"/>
+    <rect x="0" y="7.5" width="9" height="1" fill="#00ffff" opacity="0.8"/>
+    <rect x="7.5" y="7" width="1" height="9" fill="#00ffff" opacity="0.8"/>
+  </g>
+
+  <!-- Tile 14 (index 1101=13): T-junction UP + DOWN + LEFT -->
+  <g transform="translate(224, 0)">
+    <rect width="16" height="16" fill="#1a2a2a"/>
+    <rect x="7" y="0" width="2" height="16" fill="#00aaaa" opacity="0.6"/>
+    <rect x="0" y="7" width="9" height="2" fill="#00aaaa" opacity="0.6"/>
+    <rect x="7.5" y="0" width="1" height="16" fill="#00ffff" opacity="0.8"/>
+    <rect x="0" y="7.5" width="9" height="1" fill="#00ffff" opacity="0.8"/>
+  </g>
+
+  <!-- Tile 15 (index 1110=14): T-junction DOWN + LEFT + RIGHT -->
+  <g transform="translate(240, 0)">
+    <rect width="16" height="16" fill="#1a2a2a"/>
+    <rect x="0" y="7" width="16" height="2" fill="#00aaaa" opacity="0.6"/>
+    <rect x="7" y="7" width="2" height="9" fill="#00aaaa" opacity="0.6"/>
+    <rect x="0" y="7.5" width="16" height="1" fill="#00ffff" opacity="0.8"/>
+    <rect x="7.5" y="7" width="1" height="9" fill="#00ffff" opacity="0.8"/>
+  </g>
+
+  <!-- Tile 16 (index 1111=15): Cross (all 4 directions) -->
+  <g transform="translate(256, 0)">
+    <rect width="16" height="16" fill="#1a2a2a"/>
+    <rect x="0" y="7" width="16" height="2" fill="#00aaaa" opacity="0.6"/>
+    <rect x="7" y="0" width="2" height="16" fill="#00aaaa" opacity="0.6"/>
+    <rect x="0" y="7.5" width="16" height="1" fill="#00ffff" opacity="0.8"/>
+    <rect x="7.5" y="0" width="1" height="16" fill="#00ffff" opacity="0.8"/>
+  </g>
+
+  <!-- Tile 17: Empty/Floor (for reference, transparent) -->
+  <g transform="translate(272, 0)">
+    <rect width="16" height="16" fill="#0a0a0a"/>
+  </g>
+</svg>

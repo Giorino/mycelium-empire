@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=3 uid="uid://minion_scene_uid"]
+
+[ext_resource type="Script" path="res://scripts/entities/minion.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://v4pdy4daeebm" path="res://assets/sprites/minion.svg" id="2"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 6.0
+
+[node name="Minion" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("1")
+move_speed = 60.0
+wander_radius = 100.0
+max_hunger = 100.0
+hunger_rate = 1.0
+starvation_threshold = 20.0
+harvest_duration = 2.0
+sight_range = 300.0
+nutrient_per_harvest = 20
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_1")

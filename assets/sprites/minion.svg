@@ -1,0 +1,23 @@
+<svg width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+  <!-- Blob-like fungal minion creature -->
+  <!-- Body - organic blob shape -->
+  <ellipse cx="8" cy="10" rx="6" ry="5" fill="#00aa88" opacity="0.9"/>
+
+  <!-- Highlights for glossy/wet fungal look -->
+  <ellipse cx="6" cy="8" rx="2" ry="1.5" fill="#00ffcc" opacity="0.6"/>
+
+  <!-- Eyes - simple dots -->
+  <circle cx="6" cy="9" r="1" fill="#003322"/>
+  <circle cx="10" cy="9" r="1" fill="#003322"/>
+
+  <!-- Eye highlights -->
+  <circle cx="6.5" cy="8.5" r="0.3" fill="#00ffcc"/>
+  <circle cx="10.5" cy="8.5" r="0.3" fill="#00ffcc"/>
+
+  <!-- Bottom pseudopod/feet -->
+  <ellipse cx="5" cy="14" rx="1.5" ry="1" fill="#008866"/>
+  <ellipse cx="11" cy="14" rx="1.5" ry="1" fill="#008866"/>
+
+  <!-- Subtle glow aura -->
+  <ellipse cx="8" cy="10" rx="7" ry="6" fill="#00ffcc" opacity="0.15"/>
+</svg>

@@ -8,15 +8,23 @@ extends Camera2D
 @export var min_zoom: float = 0.25
 @export var max_zoom: float = 4.0
 
+# Screen shake variables
+var shake_intensity: float = 0.0
+var shake_duration: float = 0.0
+var shake_timer: float = 0.0
+var original_offset: Vector2 = Vector2.ZERO
+
 func _ready() -> void:
 	# Start with a nice zoom level to see the cave
 	zoom = Vector2(1.5, 1.5)
+	original_offset = offset
 
 
 func _process(delta: float) -> void:
 	_handle_panning(delta)
 	_handle_zoom()
 	_handle_regeneration()
+	_handle_screen_shake(delta)
 
 
 func _handle_panning(delta: float) -> void:
@@ -68,3 +76,28 @@ func _input(event: InputEvent) -> void:
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
 			var new_zoom = clamp(zoom.x - zoom_speed, min_zoom, max_zoom)
 			zoom = Vector2(new_zoom, new_zoom)
+
+
+## Handle screen shake animation
+func _handle_screen_shake(delta: float) -> void:
+	if shake_timer > 0:
+		shake_timer -= delta
+
+		# Apply random offset based on intensity
+		var shake_offset = Vector2(
+			randf_range(-shake_intensity, shake_intensity),
+			randf_range(-shake_intensity, shake_intensity)
+		)
+		offset = original_offset + shake_offset
+	else:
+		# Reset to original offset when shake ends
+		if shake_intensity > 0:
+			offset = original_offset
+			shake_intensity = 0.0
+
+
+## Apply screen shake effect
+func apply_shake(intensity: float, duration: float) -> void:
+	shake_intensity = intensity
+	shake_duration = duration
+	shake_timer = duration
