@@ -1,241 +1,187 @@
-<svg width="272" height="16" xmlns="http://www.w3.org/2000/svg">
-  <!-- Connected Mycelium Vein Tileset - Organic fuzzy threads -->
-  <!-- Each tile shows thin glowing threads that connect to neighbors -->
-  <!-- Bits: UP=1, RIGHT=2, DOWN=4, LEFT=8 -->
-
-  <!-- Tile 0 (index 0000=0): Isolated spot - small fuzzy node -->
+<svg width="272" height="16" xmlns="http://www.w3.org/2000/svg" style="background-color: #000205; image-rendering: pixelated;">
   <g transform="translate(0, 0)">
-    <rect width="16" height="16" fill="none"/>
-    <!-- Fuzzy glow (multiple layers for organic look) -->
-    <circle cx="8" cy="8" r="4" fill="#00ccff" opacity="0.15"/>
-    <circle cx="8" cy="8" r="2.5" fill="#00ffff" opacity="0.3"/>
-    <circle cx="8" cy="8" r="1.5" fill="#ffffff" opacity="0.6"/>
-    <!-- Small spore dots around the center -->
-    <circle cx="6" cy="6" r="0.5" fill="#00ffff" opacity="0.8"/>
-    <circle cx="10" cy="6" r="0.5" fill="#00ffff" opacity="0.8"/>
-    <circle cx="6" cy="10" r="0.5" fill="#00ffff" opacity="0.8"/>
-    <circle cx="10" cy="10" r="0.5" fill="#00ffff" opacity="0.8"/>
+    <rect x="2" y="2" width="12" height="12" fill="#001a33"/>
+    <rect x="1" y="4" width="14" height="8" fill="#001a33"/>
+    <rect x="4" y="1" width="8" height="14" fill="#001a33"/>
+    <rect x="0" y="0" width="4" height="4" fill="#001a33"/>
+    <rect x="12" y="12" width="4" height="4" fill="#001a33"/>
+    <rect x="12" y="0" width="4" height="3" fill="#001a33"/>
+    <rect x="4" y="4" width="8" height="8" fill="#00d4ff"/>
+    <rect x="2" y="6" width="12" height="4" fill="#00d4ff"/>
+    <rect x="1" y="1" width="2" height="2" fill="#00d4ff"/>
+    <rect x="13" y="13" width="2" height="2" fill="#00d4ff"/>
+    <rect x="6" y="6" width="4" height="4" fill="#ffffff"/>
   </g>
 
-  <!-- Tile 1 (index 0001=1): Connection UP only -->
   <g transform="translate(16, 0)">
-    <rect width="16" height="16" fill="none"/>
-    <!-- Thread extending upward -->
-    <rect x="7.25" y="0" width="1.5" height="10" fill="#00ccff" opacity="0.2"/>
-    <rect x="7.5" y="0" width="1" height="10" fill="#00ffff" opacity="0.4"/>
-    <rect x="7.75" y="0" width="0.5" height="10" fill="#ffffff" opacity="0.6"/>
-    <!-- Node at bottom -->
-    <circle cx="8" cy="10" r="2.5" fill="#00ccff" opacity="0.2"/>
-    <circle cx="8" cy="10" r="1.5" fill="#00ffff" opacity="0.4"/>
-    <circle cx="8" cy="10" r="0.8" fill="#ffffff" opacity="0.7"/>
+    <rect x="1" y="10" width="14" height="6" fill="#001a33"/>
+    <rect x="3" y="0" width="10" height="12" fill="#001a33"/>
+    <rect x="0" y="4" width="4" height="6" fill="#001a33"/>
+    <rect x="12" y="2" width="4" height="5" fill="#001a33"/>
+    <rect x="6" y="0" width="4" height="16" fill="#00d4ff"/>
+    <rect x="4" y="8" width="8" height="4" fill="#00d4ff"/>
+    <rect x="1" y="5" width="2" height="3" fill="#00d4ff"/>
+    <rect x="13" y="3" width="2" height="2" fill="#00d4ff"/>
+    <rect x="7" y="9" width="3" height="2" fill="#ffffff"/>
   </g>
 
-  <!-- Tile 2 (index 0010=2): Connection RIGHT only -->
   <g transform="translate(32, 0)">
-    <rect width="16" height="16" fill="none"/>
-    <!-- Thread extending right -->
-    <rect x="6" y="7.25" width="10" height="1.5" fill="#00ccff" opacity="0.2"/>
-    <rect x="6" y="7.5" width="10" height="1" fill="#00ffff" opacity="0.4"/>
-    <rect x="6" y="7.75" width="10" height="0.5" fill="#ffffff" opacity="0.6"/>
-    <!-- Node at left -->
-    <circle cx="6" cy="8" r="2.5" fill="#00ccff" opacity="0.2"/>
-    <circle cx="6" cy="8" r="1.5" fill="#00ffff" opacity="0.4"/>
-    <circle cx="6" cy="8" r="0.8" fill="#ffffff" opacity="0.7"/>
+    <rect x="0" y="1" width="6" height="14" fill="#001a33"/>
+    <rect x="4" y="3" width="12" height="10" fill="#001a33"/>
+    <rect x="2" y="0" width="5" height="4" fill="#001a33"/>
+    <rect x="2" y="12" width="5" height="4" fill="#001a33"/>
+    <rect x="0" y="6" width="16" height="4" fill="#00d4ff"/>
+    <rect x="8" y="5" width="6" height="6" fill="#00d4ff"/>
+    <rect x="3" y="1" width="2" height="2" fill="#00d4ff"/>
+    <rect x="3" y="13" width="2" height="2" fill="#00d4ff"/>
+    <rect x="10" y="7" width="3" height="2" fill="#ffffff"/>
   </g>
 
-  <!-- Tile 3 (index 0011=3): Corner UP + RIGHT -->
   <g transform="translate(48, 0)">
-    <rect width="16" height="16" fill="none"/>
-    <!-- Vertical thread -->
-    <rect x="7.5" y="0" width="1" height="9" fill="#00ffff" opacity="0.4"/>
-    <rect x="7.75" y="0" width="0.5" height="9" fill="#ffffff" opacity="0.6"/>
-    <!-- Horizontal thread -->
-    <rect x="7" y="7.5" width="9" height="1" fill="#00ffff" opacity="0.4"/>
-    <rect x="7" y="7.75" width="9" height="0.5" fill="#ffffff" opacity="0.6"/>
-    <!-- Glow around junction -->
-    <circle cx="8" cy="8" r="3" fill="#00ccff" opacity="0.15"/>
-    <circle cx="8" cy="8" r="1.5" fill="#00ffff" opacity="0.3"/>
+    <rect x="3" y="0" width="13" height="13" fill="#001a33"/>
+    <rect x="8" y="3" width="8" height="13" fill="#001a33"/>
+    <rect x="0" y="8" width="6" height="8" fill="#001a33"/>
+    <rect x="1" y="10" width="4" height="4" fill="#001a33"/>
+    <rect x="6" y="0" width="6" height="8" fill="#00d4ff"/>
+    <rect x="8" y="6" width="8" height="6" fill="#00d4ff"/>
+    <rect x="2" y="11" width="3" height="3" fill="#00d4ff"/>
+    <rect x="7" y="5" width="6" height="6" fill="#ffffff"/>
   </g>
 
-  <!-- Tile 4 (index 0100=4): Connection DOWN only -->
   <g transform="translate(64, 0)">
-    <rect width="16" height="16" fill="none"/>
-    <!-- Thread extending downward -->
-    <rect x="7.5" y="6" width="1" height="10" fill="#00ffff" opacity="0.4"/>
-    <rect x="7.75" y="6" width="0.5" height="10" fill="#ffffff" opacity="0.6"/>
-    <!-- Node at top -->
-    <circle cx="8" cy="6" r="2.5" fill="#00ccff" opacity="0.2"/>
-    <circle cx="8" cy="6" r="1.5" fill="#00ffff" opacity="0.4"/>
-    <circle cx="8" cy="6" r="0.8" fill="#ffffff" opacity="0.7"/>
+    <rect x="1" y="0" width="14" height="6" fill="#001a33"/>
+    <rect x="3" y="4" width="10" height="12" fill="#001a33"/>
+    <rect x="0" y="8" width="4" height="5" fill="#001a33"/>
+    <rect x="12" y="6" width="4" height="7" fill="#001a33"/>
+    <rect x="6" y="0" width="4" height="16" fill="#00d4ff"/>
+    <rect x="5" y="4" width="6" height="4" fill="#00d4ff"/>
+    <rect x="1" y="9" width="2" height="2" fill="#00d4ff"/>
+    <rect x="13" y="8" width="2" height="3" fill="#00d4ff"/>
+    <rect x="7" y="5" width="3" height="2" fill="#ffffff"/>
   </g>
 
-  <!-- Tile 5 (index 0101=5): Vertical line UP + DOWN -->
   <g transform="translate(80, 0)">
-    <rect width="16" height="16" fill="none"/>
-    <!-- Vertical thread through center -->
-    <rect x="7.25" y="0" width="1.5" height="16" fill="#00ccff" opacity="0.2"/>
-    <rect x="7.5" y="0" width="1" height="16" fill="#00ffff" opacity="0.4"/>
-    <rect x="7.75" y="0" width="0.5" height="16" fill="#ffffff" opacity="0.6"/>
-    <!-- Center node -->
-    <circle cx="8" cy="8" r="2" fill="#00ccff" opacity="0.15"/>
-    <circle cx="8" cy="8" r="1" fill="#ffffff" opacity="0.5"/>
+    <rect x="3" y="0" width="10" height="16" fill="#001a33"/>
+    <rect x="0" y="3" width="5" height="6" fill="#001a33"/>
+    <rect x="11" y="8" width="5" height="6" fill="#001a33"/>
+    <rect x="6" y="0" width="4" height="16" fill="#00d4ff"/>
+    <rect x="2" y="5" width="12" height="2" fill="#00d4ff"/>
+    <rect x="2" y="11" width="12" height="2" fill="#00d4ff"/>
+    <rect x="1" y="4" width="2" height="3" fill="#00d4ff"/>
+    <rect x="13" y="10" width="2" height="3" fill="#00d4ff"/>
   </g>
 
-  <!-- Tile 6 (index 0110=6): Corner DOWN + RIGHT -->
   <g transform="translate(96, 0)">
-    <rect width="16" height="16" fill="none"/>
-    <!-- Horizontal thread -->
-    <rect x="7" y="7.5" width="9" height="1" fill="#00ffff" opacity="0.4"/>
-    <rect x="7" y="7.75" width="9" height="0.5" fill="#ffffff" opacity="0.6"/>
-    <!-- Vertical thread -->
-    <rect x="7.5" y="7" width="1" height="9" fill="#00ffff" opacity="0.4"/>
-    <rect x="7.75" y="7" width="0.5" height="9" fill="#ffffff" opacity="0.6"/>
-    <!-- Glow around junction -->
-    <circle cx="8" cy="8" r="3" fill="#00ccff" opacity="0.15"/>
-    <circle cx="8" cy="8" r="1.5" fill="#00ffff" opacity="0.3"/>
+    <rect x="3" y="3" width="13" height="13" fill="#001a33"/>
+    <rect x="8" y="0" width="8" height="13" fill="#001a33"/>
+    <rect x="0" y="0" width="6" height="6" fill="#001a33"/>
+    <rect x="2" y="2" width="4" height="4" fill="#001a33"/>
+    <rect x="6" y="8" width="6" height="8" fill="#00d4ff"/>
+    <rect x="8" y="6" width="8" height="6" fill="#00d4ff"/>
+    <rect x="1" y="1" width="3" height="3" fill="#00d4ff"/>
+    <rect x="7" y="7" width="6" height="6" fill="#ffffff"/>
   </g>
 
-  <!-- Tile 7 (index 0111=7): T-junction UP + DOWN + RIGHT -->
   <g transform="translate(112, 0)">
-    <rect width="16" height="16" fill="none"/>
-    <!-- Vertical thread -->
-    <rect x="7.5" y="0" width="1" height="16" fill="#00ffff" opacity="0.4"/>
-    <rect x="7.75" y="0" width="0.5" height="16" fill="#ffffff" opacity="0.6"/>
-    <!-- Horizontal thread to right -->
-    <rect x="7" y="7.5" width="9" height="1" fill="#00ffff" opacity="0.4"/>
-    <rect x="7" y="7.75" width="9" height="0.5" fill="#ffffff" opacity="0.6"/>
-    <!-- Junction glow -->
-    <circle cx="8" cy="8" r="3.5" fill="#00ccff" opacity="0.2"/>
-    <circle cx="8" cy="8" r="2" fill="#00ffff" opacity="0.3"/>
-    <circle cx="8" cy="8" r="1" fill="#ffffff" opacity="0.6"/>
+    <rect x="3" y="0" width="10" height="16" fill="#001a33"/>
+    <rect x="8" y="3" width="8" height="10" fill="#001a33"/>
+    <rect x="0" y="5" width="5" height="7" fill="#001a33"/>
+    <rect x="6" y="0" width="4" height="16" fill="#00d4ff"/>
+    <rect x="8" y="6" width="8" height="4" fill="#00d4ff"/>
+    <rect x="1" y="7" width="3" height="3" fill="#00d4ff"/>
+    <rect x="5" y="5" width="8" height="6" fill="#ffffff"/>
   </g>
 
-  <!-- Tile 8 (index 1000=8): Connection LEFT only -->
   <g transform="translate(128, 0)">
-    <rect width="16" height="16" fill="none"/>
-    <!-- Thread extending left -->
-    <rect x="0" y="7.5" width="10" height="1" fill="#00ffff" opacity="0.4"/>
-    <rect x="0" y="7.75" width="10" height="0.5" fill="#ffffff" opacity="0.6"/>
-    <!-- Node at right -->
-    <circle cx="10" cy="8" r="2.5" fill="#00ccff" opacity="0.2"/>
-    <circle cx="10" cy="8" r="1.5" fill="#00ffff" opacity="0.4"/>
-    <circle cx="10" cy="8" r="0.8" fill="#ffffff" opacity="0.7"/>
+    <rect x="10" y="1" width="6" height="14" fill="#001a33"/>
+    <rect x="0" y="3" width="12" height="10" fill="#001a33"/>
+    <rect x="8" y="0" width="6" height="5" fill="#001a33"/>
+    <rect x="8" y="11" width="6" height="5" fill="#001a33"/>
+    <rect x="0" y="6" width="16" height="4" fill="#00d4ff"/>
+    <rect x="4" y="5" width="6" height="6" fill="#00d4ff"/>
+    <rect x="10" y="2" width="3" height="2" fill="#00d4ff"/>
+    <rect x="10" y="13" width="3" height="2" fill="#00d4ff"/>
+    <rect x="5" y="7" width="3" height="2" fill="#ffffff"/>
   </g>
 
-  <!-- Tile 9 (index 1001=9): Corner UP + LEFT -->
   <g transform="translate(144, 0)">
-    <rect width="16" height="16" fill="none"/>
-    <!-- Vertical thread -->
-    <rect x="7.5" y="0" width="1" height="9" fill="#00ffff" opacity="0.4"/>
-    <rect x="7.75" y="0" width="0.5" height="9" fill="#ffffff" opacity="0.6"/>
-    <!-- Horizontal thread -->
-    <rect x="0" y="7.5" width="9" height="1" fill="#00ffff" opacity="0.4"/>
-    <rect x="0" y="7.75" width="9" height="0.5" fill="#ffffff" opacity="0.6"/>
-    <!-- Glow around junction -->
-    <circle cx="8" cy="8" r="3" fill="#00ccff" opacity="0.15"/>
-    <circle cx="8" cy="8" r="1.5" fill="#00ffff" opacity="0.3"/>
+    <rect x="0" y="0" width="13" height="13" fill="#001a33"/>
+    <rect x="0" y="3" width="16" height="10" fill="#001a33"/>
+    <rect x="10" y="10" width="6" height="6" fill="#001a33"/>
+    <rect x="4" y="0" width="6" height="8" fill="#00d4ff"/>
+    <rect x="0" y="6" width="8" height="6" fill="#00d4ff"/>
+    <rect x="12" y="12" width="3" height="3" fill="#00d4ff"/>
+    <rect x="3" y="5" width="6" height="6" fill="#ffffff"/>
   </g>
 
-  <!-- Tile 10 (index 1010=10): Horizontal line LEFT + RIGHT -->
   <g transform="translate(160, 0)">
-    <rect width="16" height="16" fill="none"/>
-    <!-- Horizontal thread through center -->
-    <rect x="0" y="7.25" width="16" height="1.5" fill="#00ccff" opacity="0.2"/>
-    <rect x="0" y="7.5" width="16" height="1" fill="#00ffff" opacity="0.4"/>
-    <rect x="0" y="7.75" width="16" height="0.5" fill="#ffffff" opacity="0.6"/>
-    <!-- Center node -->
-    <circle cx="8" cy="8" r="2" fill="#00ccff" opacity="0.15"/>
-    <circle cx="8" cy="8" r="1" fill="#ffffff" opacity="0.5"/>
+    <rect x="0" y="3" width="16" height="10" fill="#001a33"/>
+    <rect x="4" y="0" width="5" height="16" fill="#001a33"/>
+    <rect x="11" y="1" width="4" height="6" fill="#001a33"/>
+    <rect x="10" y="10" width="5" height="6" fill="#001a33"/>
+    <rect x="0" y="6" width="16" height="4" fill="#00d4ff"/>
+    <rect x="5" y="2" width="3" height="12" fill="#00d4ff"/>
+    <rect x="12" y="2" width="2" height="3" fill="#00d4ff"/>
+    <rect x="11" y="12" width="3" height="3" fill="#00d4ff"/>
   </g>
 
-  <!-- Tile 11 (index 1011=11): T-junction UP + LEFT + RIGHT -->
   <g transform="translate(176, 0)">
-    <rect width="16" height="16" fill="none"/>
-    <!-- Horizontal thread -->
-    <rect x="0" y="7.5" width="16" height="1" fill="#00ffff" opacity="0.4"/>
-    <rect x="0" y="7.75" width="16" height="0.5" fill="#ffffff" opacity="0.6"/>
-    <!-- Vertical thread to top -->
-    <rect x="7.5" y="0" width="1" height="9" fill="#00ffff" opacity="0.4"/>
-    <rect x="7.75" y="0" width="0.5" height="9" fill="#ffffff" opacity="0.6"/>
-    <!-- Junction glow -->
-    <circle cx="8" cy="8" r="3.5" fill="#00ccff" opacity="0.2"/>
-    <circle cx="8" cy="8" r="2" fill="#00ffff" opacity="0.3"/>
-    <circle cx="8" cy="8" r="1" fill="#ffffff" opacity="0.6"/>
+    <rect x="0" y="3" width="16" height="10" fill="#001a33"/>
+    <rect x="3" y="0" width="10" height="8" fill="#001a33"/>
+    <rect x="5" y="11" width="7" height="5" fill="#001a33"/>
+    <rect x="0" y="6" width="16" height="4" fill="#00d4ff"/>
+    <rect x="6" y="0" width="4" height="8" fill="#00d4ff"/>
+    <rect x="7" y="12" width="3" height="3" fill="#00d4ff"/>
+    <rect x="5" y="4" width="6" height="8" fill="#ffffff"/>
   </g>
 
-  <!-- Tile 12 (index 1100=12): Corner DOWN + LEFT -->
   <g transform="translate(192, 0)">
-    <rect width="16" height="16" fill="none"/>
-    <!-- Horizontal thread -->
-    <rect x="0" y="7.5" width="9" height="1" fill="#00ffff" opacity="0.4"/>
-    <rect x="0" y="7.75" width="9" height="0.5" fill="#ffffff" opacity="0.6"/>
-    <!-- Vertical thread -->
-    <rect x="7.5" y="7" width="1" height="9" fill="#00ffff" opacity="0.4"/>
-    <rect x="7.75" y="7" width="0.5" height="9" fill="#ffffff" opacity="0.6"/>
-    <!-- Glow around junction -->
-    <circle cx="8" cy="8" r="3" fill="#00ccff" opacity="0.15"/>
-    <circle cx="8" cy="8" r="1.5" fill="#00ffff" opacity="0.3"/>
+    <rect x="0" y="3" width="13" height="13" fill="#001a33"/>
+    <rect x="0" y="0" width="16" height="10" fill="#001a33"/>
+    <rect x="10" y="0" width="6" height="6" fill="#001a33"/>
+    <rect x="4" y="8" width="6" height="8" fill="#00d4ff"/>
+    <rect x="0" y="6" width="8" height="6" fill="#00d4ff"/>
+    <rect x="12" y="1" width="3" height="3" fill="#00d4ff"/>
+    <rect x="3" y="7" width="6" height="6" fill="#ffffff"/>
   </g>
 
-  <!-- Tile 13 (index 1101=13): T-junction UP + DOWN + LEFT -->
   <g transform="translate(208, 0)">
-    <rect width="16" height="16" fill="none"/>
-    <!-- Vertical thread -->
-    <rect x="7.5" y="0" width="1" height="16" fill="#00ffff" opacity="0.4"/>
-    <rect x="7.75" y="0" width="0.5" height="16" fill="#ffffff" opacity="0.6"/>
-    <!-- Horizontal thread to left -->
-    <rect x="0" y="7.5" width="9" height="1" fill="#00ffff" opacity="0.4"/>
-    <rect x="0" y="7.75" width="9" height="0.5" fill="#ffffff" opacity="0.6"/>
-    <!-- Junction glow -->
-    <circle cx="8" cy="8" r="3.5" fill="#00ccff" opacity="0.2"/>
-    <circle cx="8" cy="8" r="2" fill="#00ffff" opacity="0.3"/>
-    <circle cx="8" cy="8" r="1" fill="#ffffff" opacity="0.6"/>
+    <rect x="3" y="0" width="10" height="16" fill="#001a33"/>
+    <rect x="0" y="3" width="8" height="10" fill="#001a33"/>
+    <rect x="11" y="5" width="5" height="7" fill="#001a33"/>
+    <rect x="6" y="0" width="4" height="16" fill="#00d4ff"/>
+    <rect x="0" y="6" width="8" height="4" fill="#00d4ff"/>
+    <rect x="12" y="7" width="3" height="3" fill="#00d4ff"/>
+    <rect x="3" y="5" width="8" height="6" fill="#ffffff"/>
   </g>
 
-  <!-- Tile 14 (index 1110=14): T-junction DOWN + LEFT + RIGHT -->
   <g transform="translate(224, 0)">
-    <rect width="16" height="16" fill="none"/>
-    <!-- Horizontal thread -->
-    <rect x="0" y="7.5" width="16" height="1" fill="#00ffff" opacity="0.4"/>
-    <rect x="0" y="7.75" width="16" height="0.5" fill="#ffffff" opacity="0.6"/>
-    <!-- Vertical thread to bottom -->
-    <rect x="7.5" y="7" width="1" height="9" fill="#00ffff" opacity="0.4"/>
-    <rect x="7.75" y="7" width="0.5" height="9" fill="#ffffff" opacity="0.6"/>
-    <!-- Junction glow -->
-    <circle cx="8" cy="8" r="3.5" fill="#00ccff" opacity="0.2"/>
-    <circle cx="8" cy="8" r="2" fill="#00ffff" opacity="0.3"/>
-    <circle cx="8" cy="8" r="1" fill="#ffffff" opacity="0.6"/>
+    <rect x="0" y="3" width="16" height="10" fill="#001a33"/>
+    <rect x="3" y="8" width="10" height="8" fill="#001a33"/>
+    <rect x="5" y="0" width="7" height="5" fill="#001a33"/>
+    <rect x="0" y="6" width="16" height="4" fill="#00d4ff"/>
+    <rect x="6" y="8" width="4" height="8" fill="#00d4ff"/>
+    <rect x="7" y="1" width="3" height="3" fill="#00d4ff"/>
+    <rect x="5" y="5" width="6" height="8" fill="#ffffff"/>
   </g>
 
-  <!-- Tile 15 (index 1111=15): Cross (all 4 directions) -->
   <g transform="translate(240, 0)">
-    <rect width="16" height="16" fill="none"/>
-    <!-- Horizontal thread -->
-    <rect x="0" y="7.5" width="16" height="1" fill="#00ffff" opacity="0.4"/>
-    <rect x="0" y="7.75" width="16" height="0.5" fill="#ffffff" opacity="0.6"/>
-    <!-- Vertical thread -->
-    <rect x="7.5" y="0" width="1" height="16" fill="#00ffff" opacity="0.4"/>
-    <rect x="7.75" y="0" width="0.5" height="16" fill="#ffffff" opacity="0.6"/>
-    <!-- Bright junction glow -->
-    <circle cx="8" cy="8" r="4" fill="#00ccff" opacity="0.25"/>
-    <circle cx="8" cy="8" r="2.5" fill="#00ffff" opacity="0.4"/>
-    <circle cx="8" cy="8" r="1.5" fill="#ffffff" opacity="0.7"/>
-    <!-- Spore dots around junction -->
-    <circle cx="5" cy="8" r="0.4" fill="#ffffff" opacity="0.8"/>
-    <circle cx="11" cy="8" r="0.4" fill="#ffffff" opacity="0.8"/>
-    <circle cx="8" cy="5" r="0.4" fill="#ffffff" opacity="0.8"/>
-    <circle cx="8" cy="11" r="0.4" fill="#ffffff" opacity="0.8"/>
+    <rect x="0" y="0" width="16" height="16" fill="#001a33"/>
+    <rect x="4" y="0" width="8" height="16" fill="#00d4ff"/>
+    <rect x="0" y="4" width="16" height="8" fill="#00d4ff"/>
+    <rect x="4" y="4" width="8" height="8" fill="#ffffff"/>
+    <rect x="0" y="0" width="1" height="1" fill="#000205"/>
+    <rect x="15" y="0" width="1" height="1" fill="#000205"/>
+    <rect x="0" y="15" width="1" height="1" fill="#000205"/>
+    <rect x="15" y="15" width="1" height="1" fill="#000205"/>
   </g>
 
-  <!-- Tile 16: Dense mycelium mat (for mature areas) -->
   <g transform="translate(256, 0)">
-    <rect width="16" height="16" fill="none"/>
-    <circle cx="8" cy="8" r="6" fill="#00ccff" opacity="0.3"/>
-    <circle cx="8" cy="8" r="4" fill="#00ffff" opacity="0.5"/>
-    <circle cx="8" cy="8" r="2" fill="#ffffff" opacity="0.7"/>
-    <circle cx="4" cy="4" r="1" fill="#ffffff" opacity="0.6"/>
-    <circle cx="12" cy="4" r="1" fill="#ffffff" opacity="0.6"/>
-    <circle cx="4" cy="12" r="1" fill="#ffffff" opacity="0.6"/>
-    <circle cx="12" cy="12" r="1" fill="#ffffff" opacity="0.6"/>
+    <rect x="0" y="0" width="16" height="16" fill="#001a33"/>
+    <rect x="1" y="1" width="14" height="14" fill="#00d4ff"/>
+    <rect x="3" y="3" width="4" height="4" fill="#ffffff"/>
+    <rect x="9" y="3" width="4" height="3" fill="#ffffff"/>
+    <rect x="3" y="10" width="3" height="3" fill="#ffffff"/>
+    <rect x="9" y="9" width="5" height="5" fill="#ffffff"/>
   </g>
 </svg>
