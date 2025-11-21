@@ -22,6 +22,10 @@ shader_parameter/brightness_boost = 1.5
 [node name="CaveWorld" type="Node2D"]
 script = ExtResource("1")
 
+[node name="CaveBackground" type="ColorRect" parent="."]
+mouse_filter = 2
+color = Color(0.18, 0.18, 0.18, 1)
+
 [node name="CaveGenerator" type="Node" parent="."]
 script = ExtResource("2")
 

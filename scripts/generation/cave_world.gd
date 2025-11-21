@@ -80,6 +80,12 @@ func _render_cave(data: Array) -> void:
 		push_error("TileMapLayer not found! Make sure CaveWorld scene has a TileMapLayer child node.")
 		return
 
+	# Update background size
+	var background = get_node_or_null("CaveBackground")
+	if background:
+		var tile_size = tile_layer.tile_set.tile_size if tile_layer.tile_set else Vector2i(16, 16)
+		background.size = Vector2(cave_generator.cave_width * tile_size.x, cave_generator.cave_height * tile_size.y)
+
 	# Clear existing tiles
 	tile_layer.clear()
 
