@@ -66,3 +66,4 @@ This project follows an aggressive 9-month development schedule, heavily acceler
     -   Claude API
     -   Gemini CLI
 -   **Audio:** Audacity for sound design.
+-   **Art:** Use https://irokaru.github.io/pixel-scaler/ to upscale images.
