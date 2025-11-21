@@ -19,7 +19,7 @@ enum State {
 
 @export_group("Combat")
 @export var detection_range: float = 150.0
-@export var attack_range: float = 20.0
+@export var attack_range: float = 100.0
 @export var attack_damage: int = 100
 @export var attack_cooldown: float = 1.5
 @export var max_health: int = 50
@@ -152,12 +152,16 @@ func _state_chase(_delta: float) -> void:
 	# Check if in attack range
 	var distance = global_position.distance_to(target_entity.global_position)
 	
+	print("Chase: Distance to target: %.1f (Attack Range: %.1f)" % [distance, attack_range])
+	
 	if distance <= attack_range:
+		print("Chase: In range! Switching to ATTACK.")
 		_change_state(State.ATTACK)
 		return
 	
 	# Check if out of detection range
 	if distance > detection_range * 1.5:  # Give some leeway
+		print("Chase: Target lost (too far: %.1f). Switching to PATROL." % distance)
 		target_entity = null
 		_change_state(State.PATROL)
 		return

@@ -93,12 +93,23 @@ func _get_spawn_position() -> Vector2:
 	var offset = Vector2(cos(angle), sin(angle)) * distance
 	var potential_pos = center + offset
 	
-	# Check if position is valid (not in wall)
+	# Check if position is valid (not in wall and inside bounds)
 	var cave_world = get_tree().get_first_node_in_group("cave_world")
-	if cave_world and cave_world.has_method("get_tile_at_position"):
+	if cave_world:
+		var bounds = Rect2()
+		if cave_world.has_method("get_cave_bounds"):
+			bounds = cave_world.get_cave_bounds()
+		
 		# Try up to 10 times to find a valid position
 		for i in range(10):
-			if cave_world.get_tile_at_position(potential_pos) != 1: # 1 is WALL
+			var is_in_bounds = bounds.has_point(potential_pos)
+			var tile_type = -1
+			
+			if cave_world.has_method("get_tile_at_position"):
+				tile_type = cave_world.get_tile_at_position(potential_pos)
+			
+			# Valid if inside bounds AND is EMPTY (0)
+			if is_in_bounds and tile_type == 0: # 0 is EMPTY
 				return potential_pos
 			
 			# Try another random position
