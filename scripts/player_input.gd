@@ -12,8 +12,10 @@ var mouse_world_pos: Vector2
 
 # Building state
 var is_build_mode: bool = false
-var selected_building: Resource = preload("res://resources/buildings/spore_pod.tres")
-var mother_egg_resource: Resource = preload("res://resources/buildings/mother_egg.tres")
+var selected_building: BuildingData = load("res://resources/buildings/spore_pod.tres")
+var mother_egg_resource: BuildingData = load("res://resources/buildings/mother_egg.tres")
+var defense_tower_resource: BuildingData = load("res://resources/buildings/defense_tower.tres")
+var spore_pod_resource: BuildingData = load("res://resources/buildings/spore_pod.tres")
 
 # Game State
 var is_game_started: bool = false
@@ -46,6 +48,17 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and event.keycode == KEY_B:
 		is_build_mode = !is_build_mode
 		print("Build Mode: %s" % is_build_mode)
+		
+	# Select buildings
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_1:
+			selected_building = spore_pod_resource
+			print("Selected: Spore Pod")
+			is_build_mode = true
+		elif event.keycode == KEY_2:
+			selected_building = defense_tower_resource
+			print("Selected: Defense Tower")
+			is_build_mode = true
 		
 	# Handle mouse clicks
 	if event is InputEventMouseButton:
@@ -83,13 +96,13 @@ func _handle_building_placement() -> void:
 				# For now, let's assume starting nutrients cover it.
 			
 			# 2. Place Egg
-			var success = building_manager.place_building(mouse_world_pos, selected_building)
+			var egg_placed = building_manager.place_building(mouse_world_pos, selected_building)
 			
-			if success:
+			if egg_placed:
 				print("Mother Egg placed! Game Started.")
 				is_game_started = true
 				is_build_mode = false # Exit build mode
-				selected_building = preload("res://resources/buildings/spore_pod.tres") # Reset to default
+				selected_building = load("res://resources/buildings/spore_pod.tres") # Reset to default
 		return
 
 	var success = building_manager.place_building(mouse_world_pos, selected_building)

@@ -42,7 +42,7 @@ func _ready() -> void:
 		push_error("BuildingManager: MyceliumManager not found!")
 
 ## Check if a building can be placed at the given world position
-func can_place_building(world_pos: Vector2, building_data: Resource) -> bool:
+func can_place_building(world_pos: Vector2, building_data: BuildingData) -> bool:
 	if not mycelium_manager:
 		return false
 		
@@ -93,7 +93,7 @@ func _update_storage_capacity() -> void:
 		mycelium_manager.update_max_nutrients(total_storage)
 
 ## Place a building at the given world position
-func place_building(world_pos: Vector2, building_data: Resource) -> bool:
+func place_building(world_pos: Vector2, building_data: BuildingData) -> bool:
 	if not can_place_building(world_pos, building_data):
 		return false
 		

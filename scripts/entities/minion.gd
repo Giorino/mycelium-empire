@@ -33,10 +33,14 @@ enum State {
 @export var upkeep_interval: float = 8.0  # Seconds between upkeep consumption
 @export var upkeep_cost: int = 10  # Nutrients consumed per upkeep tick
 
+@export_group("Combat")
+@export var max_health: int = 50
+
 # State
 var current_state: State = State.IDLE
 var hunger: float = 0.0
 var is_alive: bool = true
+var current_health: int = 50
 
 # Targeting
 var target_position: Vector2 = Vector2.ZERO
@@ -53,6 +57,7 @@ var path_index: int = 0
 # Visuals
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var animation_player: AnimationPlayer = $AnimationPlayer if has_node("AnimationPlayer") else null
+@onready var health_bar: Node2D = $HealthBar if has_node("HealthBar") else null
 
 # Animation state
 var idle_bounce_time: float = 0.0
@@ -78,6 +83,11 @@ func _ready() -> void:
 		push_error("Minion: Could not find MyceliumManager!")
 
 	print("Minion ready - CaveWorld: %s, MyceliumManager: %s" % [cave_world != null, mycelium_manager != null])
+
+	# Initialize health
+	current_health = max_health
+	if health_bar and health_bar.has_method("setup"):
+		health_bar.setup(current_health, max_health)
 
 	# Spawn animation - pop in!
 	_play_spawn_animation()
@@ -207,7 +217,7 @@ func _state_seeking_nutrient(_delta: float) -> void:
 			_change_state(State.IDLE)
 	else:
 		# No nutrient found, stay idle
-		print("No reachable nutrients found (need mycelium connection)")
+		# print("No reachable nutrients found (need mycelium connection)")
 		_change_state(State.IDLE)
 
 
@@ -438,7 +448,7 @@ func _reconstruct_path(came_from: Dictionary, current: Vector2i, tile_layer: Til
 
 
 ## Move along current path using waypoints
-func _move_along_path(delta: float) -> void:
+func _move_along_path(_delta: float) -> void:
 	if not mycelium_manager or path.is_empty():
 		velocity = Vector2.ZERO
 		return
@@ -514,7 +524,7 @@ func _change_state(new_state: State) -> void:
 
 	# Enter new state
 	current_state = new_state
-	print("Minion state changed to: %s (Hunger: %.1f)" % [_state_to_string(new_state), hunger])
+	# print("Minion state changed to: %s (Hunger: %.1f)" % [_state_to_string(new_state), hunger])
 	state_changed.emit(_state_to_string(new_state))
 
 	# State entry logic
@@ -548,7 +558,29 @@ func _die(reason: String) -> void:
 	queue_free()
 
 
-## Update visual feedback with juice!
+## Take damage from enemies
+func take_damage(amount: int) -> void:
+	if not is_alive:
+		return
+	
+	current_health -= amount
+	print("Minion took %d damage (HP: %d/%d)" % [amount, current_health, max_health])
+	
+	if health_bar and health_bar.has_method("update_health"):
+		health_bar.update_health(current_health, max_health)
+	
+	# Visual feedback
+	if sprite:
+		sprite.modulate = Color(1.0, 0.5, 0.5)  # Flash red
+		await get_tree().create_timer(0.1).timeout
+		if is_instance_valid(sprite):
+			sprite.modulate = Color(1.0, 1.0, 1.0)
+	
+	if current_health <= 0:
+		_die("killed in combat")
+
+
+## Die
 func _update_visuals(delta: float) -> void:
 	if not sprite:
 		return
@@ -611,7 +643,7 @@ func _animate_movement(delta: float) -> void:
 
 
 ## Harvesting animation - wobble and shake
-func _animate_harvesting(delta: float) -> void:
+func _animate_harvesting(_delta: float) -> void:
 	# Rapid wobble effect
 	var wobble_time = harvest_timer * 10.0
 	var wobble = sin(wobble_time) * 0.15

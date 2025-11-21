@@ -1,0 +1,28 @@
+[gd_scene load_steps=6 format=3 uid="uid://be14vylsyvpdt"]
+
+[ext_resource type="Script" path="res://scripts/buildings/defense_tower.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/projectiles/spore_projectile.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/ui/health_bar.tscn" id="3"]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/defense_tower.png" id="4"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 200.0
+
+[node name="DefenseTower" type="Node2D"]
+script = ExtResource("1")
+projectile_scene = ExtResource("2")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("4")
+modulate = Color(1, 1, 1, 1)
+
+[node name="HealthBar" parent="." instance=ExtResource("3")]
+position = Vector2(0, -20)
+
+[node name="DetectionArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea"]
+shape = SubResource("CircleShape2D_1")

@@ -1,5 +1,6 @@
 class_name CaveWorld
 extends Node2D
+@export_group("cave_world")  # Group for easy lookup
 
 ## Manages the cave world, rendering and interaction
 ## Uses CaveGenerator to create procedural caves and displays them in TileMapLayer
@@ -41,6 +42,7 @@ const CONNECT_LEFT = 8
 var cave_data: Array = []
 
 func _ready() -> void:
+	add_to_group("cave_world")
 	if auto_generate_on_ready:
 		generate_new_cave()
 

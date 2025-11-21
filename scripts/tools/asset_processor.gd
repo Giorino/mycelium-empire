@@ -2,7 +2,7 @@ extends SceneTree
 
 func _init():
 	print("Starting asset processing...")
-	var image = Image.load_from_file("res://assets/sprites/mother_egg.png")
+	var image = Image.load_from_file("res://assets/sprites/defense_tower.jpg")
 	
 	if not image:
 		print("Failed to load image!")
@@ -24,7 +24,7 @@ func _init():
 	image.resize(32, 32, Image.INTERPOLATE_NEAREST)
 	
 	# Save back
-	var err = image.save_png("res://assets/sprites/mother_egg.png")
+	var err = image.save_png("res://assets/sprites/defense_tower.png")
 	if err != OK:
 		print("Failed to save image: %d" % err)
 		quit(1)

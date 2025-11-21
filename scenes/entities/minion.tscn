@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://minion_scene_uid"]
+[gd_scene load_steps=5 format=3 uid="uid://minion_scene_uid"]
 
 [ext_resource type="Script" path="res://scripts/entities/minion.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://v4pdy4daeebm" path="res://assets/sprites/minion.svg" id="2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/minion.svg" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/ui/health_bar.tscn" id="3"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 6.0
@@ -21,6 +22,9 @@ nutrient_per_harvest = 20
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2")
+
+[node name="HealthBar" parent="." instance=ExtResource("3")]
+position = Vector2(0, -12)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_1")

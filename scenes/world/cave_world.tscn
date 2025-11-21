@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://djy5m8n3k2qwp"]
+[gd_scene load_steps=12 format=3 uid="uid://djy5m8n3k2qwp"]
 
 [ext_resource type="Script" uid="uid://ctxysu7wf5iw4" path="res://scripts/generation/cave_world.gd" id="1"]
 [ext_resource type="Script" uid="uid://146fjqtp526e" path="res://scripts/generation/cave_generator.gd" id="2"]
@@ -9,6 +9,8 @@
 [ext_resource type="PackedScene" path="res://scenes/entities/minion.tscn" id="7"]
 [ext_resource type="Shader" path="res://resources/shaders/mycelium_glow.gdshader" id="8"]
 [ext_resource type="Script" path="res://scripts/systems/building_manager.gd" id="9"]
+[ext_resource type="Script" path="res://scripts/systems/enemy_manager.gd" id="10"]
+[ext_resource type="PackedScene" uid="uid://c8d9e0f1g2h3i" path="res://scenes/entities/predator.tscn" id="11"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_1"]
 shader = ExtResource("8")
@@ -40,3 +42,8 @@ script = ExtResource("9")
 script = ExtResource("6")
 minion_scene = ExtResource("7")
 spawn_radius = 50.0
+
+[node name="EnemyManager" type="Node2D" parent="."]
+script = ExtResource("10")
+predator_scene = ExtResource("11")
+

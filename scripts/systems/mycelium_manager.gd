@@ -19,7 +19,7 @@ signal nutrients_changed(current: int, max: int)
 
 @export_group("Visual Settings")
 @export var enable_glow: bool = true
-@export var glow_energy: float = 0.1 # 1.5
+@export var glow_energy: float = 0.05 # 1.5
 @export var glow_radius: float = 20.0 # 32.0
 @export var particle_amount: int = 16
 
