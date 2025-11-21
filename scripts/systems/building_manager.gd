@@ -41,20 +41,43 @@ func _ready() -> void:
 	if not mycelium_manager:
 		push_error("BuildingManager: MyceliumManager not found!")
 
+## Get all grid positions occupied by a building
+## Uses center-tile placement: for a 3x3 building, center is clicked position
+func _get_occupied_tiles(center_pos: Vector2i, grid_size: Vector2i) -> Array[Vector2i]:
+	var tiles: Array[Vector2i] = []
+	var half_x = int(grid_size.x / 2)
+	var half_y = int(grid_size.y / 2)
+	
+	for y in range(grid_size.y):
+		for x in range(grid_size.x):
+			var offset_x = x - half_x
+			var offset_y = y - half_y
+			tiles.append(center_pos + Vector2i(offset_x, offset_y))
+	
+	return tiles
+
+
+
 ## Check if a building can be placed at the given world position
 func can_place_building(world_pos: Vector2, building_data: BuildingData) -> bool:
 	if not mycelium_manager:
 		return false
 		
-	var grid_pos = mycelium_manager.mycelium_layer.local_to_map(world_pos)
+	var center_grid_pos = mycelium_manager.mycelium_layer.local_to_map(world_pos)
 	
-	# 1. Must be on Mycelium
-	if not mycelium_manager.has_mycelium_at(world_pos):
-		return false
-		
-	# 2. Must not already have a building
-	if buildings.has(grid_pos):
-		return false
+	# Get all tiles this building will occupy
+	var occupied_tiles = _get_occupied_tiles(center_grid_pos, building_data.grid_size)
+	
+	# 1. All tiles must be on Mycelium
+	for tile_pos in occupied_tiles:
+		var tile_world_pos = mycelium_manager.mycelium_layer.map_to_local(tile_pos)
+		if not mycelium_manager.has_mycelium_at(tile_world_pos):
+			return false
+	
+	# 2. All tiles must not already have a building
+	for tile_pos in occupied_tiles:
+		if buildings.has(tile_pos):
+			return false
 		
 	# 3. Must have enough nutrients
 	if mycelium_manager.current_nutrients < building_data.nutrient_cost:
@@ -72,6 +95,7 @@ func can_place_building(world_pos: Vector2, building_data: BuildingData) -> bool
 			return false
 			
 	return true
+
 
 ## Calculate total storage capacity from all buildings
 func _update_storage_capacity() -> void:
@@ -97,26 +121,33 @@ func place_building(world_pos: Vector2, building_data: BuildingData) -> bool:
 	if not can_place_building(world_pos, building_data):
 		return false
 		
-	var grid_pos = mycelium_manager.mycelium_layer.local_to_map(world_pos)
+	var center_grid_pos = mycelium_manager.mycelium_layer.local_to_map(world_pos)
 	
 	# Deduct cost
 	mycelium_manager.add_nutrients(-building_data.nutrient_cost)
 	
-	# Instantiate building
+	# Instantiate building at center position
 	var building_instance = building_data.scene.instantiate()
-	building_instance.position = mycelium_manager.mycelium_layer.map_to_local(grid_pos)
+	building_instance.position = mycelium_manager.mycelium_layer.map_to_local(center_grid_pos)
 	add_child(building_instance)
 	
-	# Track building
-	buildings[grid_pos] = building_instance
-	building_data_map[grid_pos] = building_data
+	# Get all tiles this building occupies
+	var occupied_tiles = _get_occupied_tiles(center_grid_pos, building_data.grid_size)
 	
-	emit_signal("building_placed", building_instance, grid_pos)
-	print("Placed building: %s at %v" % [building_data.name, grid_pos])
+	# Track building at ALL occupied tiles (for collision detection)
+	for tile_pos in occupied_tiles:
+		buildings[tile_pos] = building_instance
+	
+	# Store building data only at center position
+	building_data_map[center_grid_pos] = building_data
+	
+	emit_signal("building_placed", building_instance, center_grid_pos)
+	print("Placed building: %s at %v (size: %v, occupying %d tiles)" % [building_data.name, center_grid_pos, building_data.grid_size, occupied_tiles.size()])
 	
 	_update_storage_capacity()
 	
 	return true
+
 
 
 ## Get building at world position

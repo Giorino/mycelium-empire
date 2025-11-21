@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/resources/building_data.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://d3k4l5m6n7o8p" path="res://scenes/buildings/spore_pod.tscn" id="2"]
-[ext_resource type="Texture2D" path="res://assets/sprites/placeholder_spore_pod.png" id="3"]
+[ext_resource type="Texture2D" path="res://assets/sprites/placeholder_spore_pod_2x.png" id="3"]
 
 [resource]
 script = ExtResource("1")
@@ -13,6 +13,7 @@ icon = ExtResource("3")
 scene = ExtResource("2")
 nutrient_cost = 50
 nutrient_generation_rate = 1
+grid_size = Vector2i(2, 2)
 growth_time = 5.0
 menu_order = 1
 is_visible_in_menu = true

@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://b8lal0m1n2o3p"]
 
-[ext_resource type="Texture2D" path="res://assets/sprites/mother_egg.png" id="1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/mother_egg_3x.png" id="1"]
 [ext_resource type="Script" path="res://scripts/buildings/mother_egg.gd" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/ui/health_bar.tscn" id="3"]
 

@@ -11,6 +11,7 @@ extends Resource
 @export var storage_capacity: int = 0 # Increases max nutrients
 @export var build_limit: int = -1 # -1 for infinite, 1 for unique
 @export var growth_time: float = 5.0
+@export var grid_size: Vector2i = Vector2i(1, 1) # Building footprint in tiles
 
 @export_group("Menu Display")
 @export var menu_order: int = 0 # Lower numbers appear first

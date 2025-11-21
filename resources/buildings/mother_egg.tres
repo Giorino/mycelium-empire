@@ -1,8 +1,9 @@
 [gd_resource type="Resource" script_class="BuildingData" load_steps=4 format=3 uid="uid://ca2bv5lyy2o8t"]
 
-[ext_resource type="Script" path="res://scripts/resources/building_data.gd" id="1"]
-[ext_resource type="PackedScene" uid="uid://b8k9l0m1n2o3p" path="res://scenes/buildings/mother_egg.tscn" id="2"]
-[ext_resource type="Texture2D" path="res://assets/sprites/mother_egg.png" id="3"]
+[ext_resource type="Script" uid="uid://dp7knajyu5f5t" path="res://scripts/resources/building_data.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://b8lal0m1n2o3p" path="res://scenes/buildings/mother_egg.tscn" id="2"]
+[ext_resource type="Texture2D" uid="uid://ceprkf4jcywim" path="res://assets/sprites/mother_egg_3x.png" id="3"]
+
 
 [resource]
 script = ExtResource("1")
@@ -16,5 +17,6 @@ nutrient_generation_rate = 0
 storage_capacity = 500
 build_limit = 1
 growth_time = 3.0
+grid_size = Vector2i(3, 3)
 menu_order = 0
 is_visible_in_menu = true

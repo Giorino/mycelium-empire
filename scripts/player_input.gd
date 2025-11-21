@@ -111,16 +111,26 @@ func _handle_building_placement() -> void:
 	# Special check for Mother Egg (Game Start)
 	if not is_game_started:
 		if selected_building.id == "mother_egg":
-			# Mother Egg can be placed anywhere (doesn't need Mycelium)
-			# But we need to hack the BuildingManager or MyceliumManager to allow it?
-			# Actually, let's just place some initial mycelium UNDER the egg automatically.
+			# Mother Egg needs mycelium under ALL tiles in its footprint
+			# For 3x3 egg, we need to place mycelium at 9 positions
 			
-			# 1. Place Mycelium at this spot (free)
 			if mycelium_manager:
-				mycelium_manager.place_mycelium(mouse_world_pos, true) # Ignore cost for Mother Egg base
-				# Force place? MyceliumManager checks cost. 
-				# Let's give player some starting nutrients to cover it, or make a force function.
-				# For now, let's assume starting nutrients cover it.
+				# Calculate center grid position
+				var center_grid_pos = mycelium_manager.mycelium_layer.local_to_map(mouse_world_pos)
+				
+				# Get all tiles the egg will occupy (using same logic as BuildingManager)
+				var grid_size = selected_building.grid_size
+				var half_x = int(grid_size.x / 2)
+				var half_y = int(grid_size.y / 2)
+				
+				# Place mycelium at ALL tiles
+				for y in range(grid_size.y):
+					for x in range(grid_size.x):
+						var offset_x = x - half_x
+						var offset_y = y - half_y
+						var tile_pos = center_grid_pos + Vector2i(offset_x, offset_y)
+						var tile_world_pos = mycelium_manager.mycelium_layer.map_to_local(tile_pos)
+						mycelium_manager.place_mycelium(tile_world_pos, true) # Ignore cost
 			
 			# 2. Place Egg
 			var egg_placed = building_manager.place_building(mouse_world_pos, selected_building)

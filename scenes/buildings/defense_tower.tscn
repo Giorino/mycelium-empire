@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" path="res://scenes/projectiles/spore_projectile.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/ui/health_bar.tscn" id="3"]
 
-[ext_resource type="Texture2D" path="res://assets/sprites/defense_tower.png" id="4"]
+[ext_resource type="Texture2D" path="res://assets/sprites/defense_tower_2x.png" id="4"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 200.0
