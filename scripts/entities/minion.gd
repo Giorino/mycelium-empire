@@ -174,7 +174,7 @@ func _update_state(delta: float) -> void:
 func _state_idle(_delta: float) -> void:
 	# Always try to find work (nutrients to harvest)
 	# Small delay before seeking again to prevent constant state switching
-	if randf() < 0.02:  # ~2% chance per frame = ~1 check per second at 60fps
+	if randf() < 0.05:  # ~5% chance per frame (roughly 3 checks per second)
 		_change_state(State.SEEKING_NUTRIENT)
 
 
@@ -186,12 +186,12 @@ func _state_seeking_nutrient(_delta: float) -> void:
 		_change_state(State.MOVING_TO_TARGET)
 		return
 
-	# Find nearest nutrient vein (that's adjacent to mycelium)
-	var nearest_nutrient = _find_nearest_nutrient()
+	# Find nearest nutrient vein AND reserve it atomically
+	var nearest_nutrient = _find_and_reserve_nearest_nutrient()
 
 	if nearest_nutrient != Vector2i(-999, -999):
-		print("Minion found nutrient at: %v" % nearest_nutrient)
-		# Found nutrient, move to adjacent mycelium tile
+		print("Minion %s: SUCCESSFULLY reserved nutrient at: %v" % [get_instance_id(), nearest_nutrient])
+		# Found and reserved nutrient, move to adjacent mycelium tile
 		target_nutrient_tile = nearest_nutrient
 
 		# Find a mycelium tile adjacent to the nutrient to stand on
@@ -207,6 +207,7 @@ func _state_seeking_nutrient(_delta: float) -> void:
 
 			if path.is_empty():
 				print("No path found to nutrient at %v" % nearest_nutrient)
+				_release_reservation() # Failed to find path, release
 				_change_state(State.IDLE)
 			else:
 				print("Path found with %d waypoints to harvest nutrient" % path.size())
@@ -214,6 +215,7 @@ func _state_seeking_nutrient(_delta: float) -> void:
 		else:
 			# No mycelium adjacent (shouldn't happen due to _find_nearest_nutrient check)
 			print("ERROR: Found nutrient but no adjacent mycelium!")
+			_release_reservation() # Failed
 			_change_state(State.IDLE)
 	else:
 		# No nutrient found, stay idle
@@ -235,6 +237,7 @@ func _state_moving_to_target(delta: float) -> void:
 	# If path is empty or we're stuck, give up
 	if path.is_empty():
 		print("Minion has no path - returning to idle")
+		_release_reservation()
 		_change_state(State.IDLE)
 		return
 
@@ -252,7 +255,59 @@ func _state_harvesting(delta: float) -> void:
 		_complete_harvest()
 
 
-## Find nearest nutrient vein within sight range (that's adjacent to mycelium)
+## Find nearest nutrient vein within sight range AND reserve it atomically
+func _find_and_reserve_nearest_nutrient() -> Vector2i:
+	if not cave_world or not mycelium_manager:
+		return Vector2i(-999, -999)
+
+	var tile_layer = cave_world.get_node("TileMapLayer")
+	if not tile_layer:
+		return Vector2i(-999, -999)
+
+	var my_tile_pos = tile_layer.local_to_map(position)
+	var search_radius = int(sight_range / 16.0)  # Assuming 16px tiles
+
+	# Phase 1: Find all candidate nutrients (unreserved, with adjacent mycelium)
+	var candidates: Array[Dictionary] = []
+
+	for dy in range(-search_radius, search_radius + 1):
+		for dx in range(-search_radius, search_radius + 1):
+			var check_pos = my_tile_pos + Vector2i(dx, dy)
+			var world_pos = tile_layer.map_to_local(check_pos)
+
+			# Check if this is a nutrient tile
+			if cave_world.get_tile_at_position(world_pos) == 2:  # TileType.NUTRIENT
+				# Skip if already reserved
+				if cave_world.has_method("is_nutrient_reserved") and cave_world.is_nutrient_reserved(check_pos):
+					continue
+				
+				# Check if there's mycelium adjacent to this nutrient
+				if _has_mycelium_adjacent_to(check_pos):
+					var distance = position.distance_to(world_pos)
+					candidates.append({
+						"position": check_pos,
+						"distance": distance
+					})
+
+	# Phase 2: Sort by distance and try to reserve the closest one
+	if candidates.is_empty():
+		return Vector2i(-999, -999)
+	
+	candidates.sort_custom(func(a, b): return a["distance"] < b["distance"])
+	
+	# Try to reserve candidates in order of distance
+	for candidate in candidates:
+		var pos = candidate["position"]
+		if cave_world.has_method("reserve_nutrient"):
+			if cave_world.reserve_nutrient(pos, self):
+				return pos  # Successfully reserved!
+			# Else: someone else grabbed it between check and reserve, try next candidate
+	
+	# All candidates were taken
+	return Vector2i(-999, -999)
+
+
+## Find nearest nutrient vein within sight range (that's adjacent to mycelium) - OLD VERSION, NOT USED
 func _find_nearest_nutrient() -> Vector2i:
 	if not cave_world or not mycelium_manager:
 		return Vector2i(-999, -999)
@@ -275,6 +330,13 @@ func _find_nearest_nutrient() -> Vector2i:
 
 			# Check if this is a nutrient tile
 			if cave_world.get_tile_at_position(world_pos) == 2:  # TileType.NUTRIENT
+				
+				# CHECK RESERVATION
+				if cave_world.has_method("is_nutrient_reserved"):
+					if cave_world.is_nutrient_reserved(check_pos):
+						# print("Minion skipping reserved nutrient at %v" % check_pos)
+						continue # Skip if reserved by someone else
+
 				# IMPORTANT: Check if there's mycelium adjacent to this nutrient
 				# (so minion can stand on mycelium and harvest the nutrient)
 				if _has_mycelium_adjacent_to(check_pos):
@@ -509,6 +571,14 @@ func _complete_harvest() -> void:
 	_change_state(State.IDLE)
 
 
+## Release reservation helper
+func _release_reservation() -> void:
+	if target_nutrient_tile != Vector2i(-999, -999):
+		if cave_world and cave_world.has_method("release_nutrient"):
+			print("Minion %s: Releasing reservation for %v" % [get_instance_id(), target_nutrient_tile])
+			cave_world.release_nutrient(target_nutrient_tile, self)
+
+
 ## Change state
 func _change_state(new_state: State) -> void:
 	if current_state == new_state:
@@ -521,6 +591,14 @@ func _change_state(new_state: State) -> void:
 			# Reset rotation from harvesting wobble
 			if sprite:
 				sprite.rotation = 0.0
+		State.SEEKING_NUTRIENT:
+			# If we leave seeking (e.g. interruption), release reservation UNLESS we're moving to target or harvesting
+			if new_state != State.MOVING_TO_TARGET and new_state != State.HARVESTING:
+				_release_reservation()
+		State.MOVING_TO_TARGET:
+			# If we leave moving to target (e.g. interruption), release reservation UNLESS we're harvesting
+			if new_state != State.HARVESTING:
+				_release_reservation()
 
 	# Enter new state
 	current_state = new_state
@@ -545,6 +623,7 @@ func _die(reason: String) -> void:
 	if not is_alive:
 		return
 
+	_release_reservation() # Clean up any reservations
 	is_alive = false
 	print("Minion died: ", reason)
 

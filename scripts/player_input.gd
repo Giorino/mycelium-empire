@@ -21,6 +21,7 @@ var spore_pod_resource: BuildingData = load("res://resources/buildings/spore_pod
 var is_game_started: bool = false
 
 @onready var building_manager: Node = get_node("../CaveWorld/BuildingManager")
+@onready var game_ui: Control = get_node("../CanvasLayer/UI")
 
 
 func _ready() -> void:
@@ -43,7 +44,7 @@ func _process(_delta: float) -> void:
 	_update_mouse_position()
 
 
-func _input(event: InputEvent) -> void:
+func _unhandled_input(event: InputEvent) -> void:
 	# Toggle build mode
 	if event is InputEventKey and event.pressed and event.keycode == KEY_B:
 		is_build_mode = !is_build_mode
@@ -65,16 +66,46 @@ func _input(event: InputEvent) -> void:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			if is_build_mode:
 				_handle_building_placement()
+			else:
+				_handle_selection()
 			# Direct mycelium placement removed as per design change
 			# else:
 			# 	_handle_mycelium_placement()
 		elif event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+			# Cancel build mode or selection
+			if is_build_mode:
+				is_build_mode = false
+				print("Build mode cancelled")
+			else:
+				_clear_selection()
+			
 			_handle_harvesting()
-	
+
 	# Debug shortcuts
 	if event is InputEventKey and event.pressed and event.keycode == KEY_L:
 		print("Debug: Adding 100 XP")
 		ExperienceManager.add_xp(100.0)
+
+## Handle selection of buildings
+func _handle_selection() -> void:
+	if not building_manager:
+		return
+
+	var building = building_manager.get_building_at(mouse_world_pos)
+	if building:
+		print("Selected building: %s" % building.name)
+		if building is MotherEgg:
+			print("Selected Mother Egg!")
+			if game_ui and game_ui.has_method("show_egg_actions"):
+				game_ui.show_egg_actions(building)
+		# Could add else blocks here for other building types
+	else:
+		# print("No building selected at %v" % mouse_world_pos) # Too spammy?
+		_clear_selection()
+
+func _clear_selection() -> void:
+	if game_ui and game_ui.has_method("clear_selection"):
+		game_ui.clear_selection()
 
 ## Handle building placement
 func _handle_building_placement() -> void:

@@ -41,6 +41,10 @@ const CONNECT_LEFT = 8
 # Store cave data for neighbor checks during rendering
 var cave_data: Array = []
 
+# Nutrient Vein Reservations
+# Maps nutrient tile Vector2i -> minion Node (or id)
+var nutrient_reservations: Dictionary = {}
+
 func _ready() -> void:
 	add_to_group("cave_world")
 	if auto_generate_on_ready:
@@ -61,6 +65,8 @@ func generate_new_cave() -> void:
 		print("Minion count: %d" % minion_manager.get_minion_count())
 		minion_manager.reset_colony()
 		print("Minion count: %d" % minion_manager.get_minion_count())
+		
+	nutrient_reservations.clear()
 
 	var start_time = Time.get_ticks_msec()
 
@@ -231,6 +237,10 @@ func harvest_tile_at_position(world_pos: Vector2) -> bool:
 
 		# Refresh neighboring vein tiles to update their connections
 		_refresh_vein_neighbors(map_pos)
+		
+	# Clear reservation if it exists
+	if nutrient_reservations.has(map_pos):
+		nutrient_reservations.erase(map_pos)
 
 	return true
 
@@ -281,3 +291,37 @@ func get_cave_bounds() -> Rect2:
 		Vector2.ZERO,
 		Vector2(cave_generator.cave_width * tile_size.x, cave_generator.cave_height * tile_size.y)
 	)
+
+# Reservation System
+
+## Check if a nutrient tile is reserved
+func is_nutrient_reserved(grid_pos: Vector2i) -> bool:
+	if not nutrient_reservations.has(grid_pos):
+		return false
+	
+	# Check if reserving minion is still valid
+	var minion = nutrient_reservations[grid_pos]
+	if not is_instance_valid(minion) or not minion.is_alive:
+		nutrient_reservations.erase(grid_pos)
+		return false
+		
+	return true
+
+## Reserve a nutrient tile for a minion
+func reserve_nutrient(grid_pos: Vector2i, minion: Node) -> bool:
+	print("CaveWorld: Minion %s attempting to reserve %v (currently has: %s)" % [minion.get_instance_id(), grid_pos, "yes" if nutrient_reservations.has(grid_pos) else "no"])
+	
+	if is_nutrient_reserved(grid_pos):
+		# Already reserved by someone else
+		var existing_minion = nutrient_reservations[grid_pos]
+		print("CaveWorld: FAILED to reserve %v - already taken by Minion %s (attempted by Minion %s)" % [grid_pos, existing_minion.get_instance_id(), minion.get_instance_id()])
+		return false
+		
+	nutrient_reservations[grid_pos] = minion
+	print("CaveWorld: SUCCESS - Minion %s reserved %v (total reservations: %d)" % [minion.get_instance_id(), grid_pos, nutrient_reservations.size()])
+	return true
+
+## Release reservation
+func release_nutrient(grid_pos: Vector2i, minion: Node) -> void:
+	if nutrient_reservations.has(grid_pos) and nutrient_reservations[grid_pos] == minion:
+		nutrient_reservations.erase(grid_pos)

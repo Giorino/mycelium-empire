@@ -84,9 +84,10 @@ offset_left = 20.0
 offset_top = 90.0
 offset_right = 400.0
 offset_bottom = 150.0
-text = "LEFT CLICK: Place Mycelium (10 nutrients)
-RIGHT CLICK: Harvest Nutrients (15-25 gain)
-R: Regenerate Cave
+text = "LEFT CLICK: Select / Place Building
+B: Toggle Build Mode
+1/2: Select Building Type
+RIGHT CLICK: Harvest Nutrients
 WASD: Move Camera"
 label_settings = SubResource("LabelSettings_2")
 

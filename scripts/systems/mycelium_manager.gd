@@ -435,6 +435,14 @@ func add_nutrients(amount: int) -> void:
 		
 	nutrients_changed.emit(current_nutrients, max_nutrients)
 
+## Try to spend nutrients. Returns true if successful.
+func try_spend_nutrients(amount: int) -> bool:
+	if current_nutrients >= amount:
+		current_nutrients -= amount
+		nutrients_changed.emit(current_nutrients, max_nutrients)
+		return true
+	return false
+
 ## Update max nutrients
 func update_max_nutrients(new_max: int) -> void:
 	max_nutrients = new_max

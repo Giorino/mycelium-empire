@@ -117,3 +117,12 @@ func place_building(world_pos: Vector2, building_data: BuildingData) -> bool:
 	_update_storage_capacity()
 	
 	return true
+
+
+## Get building at world position
+func get_building_at(world_pos: Vector2) -> Node2D:
+	if not mycelium_manager:
+		return null
+		
+	var grid_pos = mycelium_manager.mycelium_layer.local_to_map(world_pos)
+	return buildings.get(grid_pos)
