@@ -19,7 +19,7 @@ signal nutrients_changed(current: int, max: int)
 
 @export_group("Visual Settings")
 @export var enable_glow: bool = true
-@export var glow_energy: float = 0.01 # 1.5
+@export var glow_energy: float = 0.005 # 1.5
 @export var glow_radius: float = 20.0 # 32.0
 @export var particle_amount: int = 16
 
@@ -77,7 +77,7 @@ func _apply_glow_shader() -> void:
 		material.set_shader_parameter("pulse_speed", 1.5)
 		material.set_shader_parameter("pulse_strength", 0.25)
 		material.set_shader_parameter("glow_color", Color(0.0, 1.0, 1.0, 1.0))
-		material.set_shader_parameter("brightness_boost", 0.5)
+		material.set_shader_parameter("brightness_boost", 0.3)
 
 		mycelium_layer.material = material
 		print("Mycelium glow shader applied!")

@@ -1,23 +1,51 @@
-<svg width="16" height="16" xmlns="http://www.w3.org/2000/svg">
-  <!-- Blob-like fungal minion creature -->
-  <!-- Body - organic blob shape -->
-  <ellipse cx="8" cy="10" rx="6" ry="5" fill="#00aa88" opacity="0.9"/>
+<svg width="32" height="32" xmlns="http://www.w3.org/2000/svg" style="background-color: #000205; image-rendering: pixelated;">
+  <g fill="#001a33">
+    <rect x="6" y="8" width="20" height="16"/>
+    <rect x="4" y="10" width="2" height="12"/>
+    <rect x="26" y="10" width="2" height="12"/>
+    <rect x="2" y="12" width="2" height="8"/>
+    <rect x="28" y="12" width="2" height="8"/>
+    <rect x="8" y="6" width="16" height="2"/>
+    <rect x="10" y="4" width="12" height="2"/>
+    <rect x="6" y="24" width="20" height="2"/>
+    <rect x="8" y="26" width="16" height="2"/>
+    <rect x="6" y="28" width="6" height="2"/>
+    <rect x="20" y="28" width="6" height="2"/>
+  </g>
 
-  <!-- Highlights for glossy/wet fungal look -->
-  <ellipse cx="6" cy="8" rx="2" ry="1.5" fill="#00ffcc" opacity="0.6"/>
+  <g fill="#00d4ff">
+    <rect x="14" y="6" width="4" height="2"/>
+    <rect x="4" y="16" width="2" height="4"/>
+    <rect x="26" y="16" width="2" height="4"/>
+    <rect x="6" y="20" width="3" height="2"/>
+    <rect x="23" y="20" width="3" height="2"/>
+    <rect x="12" y="24" width="8" height="2"/>
+  </g>
 
-  <!-- Eyes - simple dots -->
-  <circle cx="6" cy="9" r="1" fill="#003322"/>
-  <circle cx="10" cy="9" r="1" fill="#003322"/>
+  <g fill="#ffffff">
+    <rect x="7" y="10" width="8" height="8"/>
+    <rect x="17" y="10" width="8" height="8"/>
+    <rect x="6" y="11" width="1" height="6"/>
+    <rect x="15" y="11" width="1" height="6"/>
+    <rect x="16" y="11" width="1" height="6"/>
+    <rect x="25" y="11" width="1" height="6"/>
+  </g>
+  <g fill="#000a14">
+    <rect x="9" y="12" width="4" height="4"/>
+    <rect x="19" y="12" width="4" height="4"/>
+  </g>
+  <g fill="#ffffff">
+    <rect x="9" y="12" width="2" height="2"/>
+    <rect x="19" y="12" width="2" height="2"/>
+  </g>
+   <g fill="#ffffff">
+    <rect x="12" y="15" width="1" height="1"/>
+    <rect x="22" y="15" width="1" height="1"/>
+  </g>
 
-  <!-- Eye highlights -->
-  <circle cx="6.5" cy="8.5" r="0.3" fill="#00ffcc"/>
-  <circle cx="10.5" cy="8.5" r="0.3" fill="#00ffcc"/>
-
-  <!-- Bottom pseudopod/feet -->
-  <ellipse cx="5" cy="14" rx="1.5" ry="1" fill="#008866"/>
-  <ellipse cx="11" cy="14" rx="1.5" ry="1" fill="#008866"/>
-
-  <!-- Subtle glow aura -->
-  <ellipse cx="8" cy="10" rx="7" ry="6" fill="#00ffcc" opacity="0.15"/>
+  <g fill="#00d4ff" opacity="0.15">
+     <rect x="10" y="3" width="12" height="1"/>
+     <rect x="1" y="12" width="1" height="8"/>
+     <rect x="30" y="12" width="1" height="8"/>
+  </g>
 </svg>
