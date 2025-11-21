@@ -13,8 +13,8 @@ enum TileType {
 
 # Generation parameters
 @export_group("Cave Dimensions")
-@export var cave_width: int = 100
-@export var cave_height: int = 60
+@export var cave_width: int = 128
+@export var cave_height: int = 128
 
 @export_group("Cellular Automata")
 @export_range(0.0, 1.0) var initial_wall_probability: float = 0.45

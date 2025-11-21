@@ -18,6 +18,20 @@ func _ready() -> void:
 	# Start with a nice zoom level to see the cave
 	zoom = Vector2(1.5, 1.5)
 	original_offset = offset
+	
+	# Center on cave after a short delay to ensure generation is complete
+	await get_tree().process_frame
+	center_on_cave()
+
+
+## Center the camera on the cave
+func center_on_cave() -> void:
+	var cave_world = get_parent().get_node_or_null("CaveWorld")
+	if cave_world and cave_world.has_method("get_cave_bounds"):
+		var bounds = cave_world.get_cave_bounds()
+		position = bounds.get_center()
+		print("Camera centered on cave at: ", position)
+
 
 
 func _process(delta: float) -> void:
@@ -64,6 +78,7 @@ func _handle_regeneration() -> void:
 		var cave_world = get_parent().get_node("CaveWorld")
 		if cave_world and cave_world.has_method("generate_new_cave"):
 			cave_world.generate_new_cave()
+			center_on_cave()
 			print("Cave regenerated! (Press R to generate again)")
 
 
