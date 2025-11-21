@@ -30,6 +30,11 @@ func _ready() -> void:
 	if not camera:
 		push_error("PlayerInput: Camera2D not found!")
 		
+	# Connect to GameUI for building selection
+	if game_ui:
+		if game_ui.has_signal("building_selected_from_menu"):
+			game_ui.building_selected_from_menu.connect(_on_building_selected_from_menu)
+		
 	# Start game in "Place Mother Egg" mode
 	_start_game_placement()
 
@@ -45,21 +50,12 @@ func _process(_delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	# Toggle build mode
+	# Toggle build menu
 	if event is InputEventKey and event.pressed and event.keycode == KEY_B:
-		is_build_mode = !is_build_mode
-		print("Build Mode: %s" % is_build_mode)
-		
-	# Select buildings
-	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_1:
-			selected_building = spore_pod_resource
-			print("Selected: Spore Pod")
-			is_build_mode = true
-		elif event.keycode == KEY_2:
-			selected_building = defense_tower_resource
-			print("Selected: Defense Tower")
-			is_build_mode = true
+		if game_ui and game_ui.has_method("toggle_build_menu"):
+			game_ui.toggle_build_menu()
+			# If we are opening the menu, we might want to exit build mode until a selection is made?
+			# For now, let's just toggle the UI.
 		
 	# Handle mouse clicks
 	if event is InputEventMouseButton:
@@ -134,12 +130,16 @@ func _handle_building_placement() -> void:
 				is_game_started = true
 				is_build_mode = false # Exit build mode
 				selected_building = load("res://resources/buildings/spore_pod.tres") # Reset to default
+				_update_blueprint() # Clear blueprint
 		return
 
 	var success = building_manager.place_building(mouse_world_pos, selected_building)
 	
 	if success:
 		print("Placed building!")
+		# Optional: Exit build mode after placement?
+		# is_build_mode = false
+		# selected_building = null
 	else:
 		print("Cannot place building here (Need Mycelium + Nutrients + Limit Check)")
 
@@ -148,6 +148,8 @@ func _handle_building_placement() -> void:
 func _update_mouse_position() -> void:
 	if camera:
 		mouse_world_pos = camera.get_global_mouse_position()
+	
+	_update_blueprint()
 
 
 ## Handle mycelium placement on click
@@ -174,3 +176,64 @@ func _handle_harvesting() -> void:
 		print("Harvested tile at: %v" % mouse_world_pos)
 	else:
 		print("Nothing to harvest at: %v" % mouse_world_pos)
+
+func _on_building_selected_from_menu(building_data: BuildingData) -> void:
+	if selected_building != building_data:
+		# Clear existing blueprint to force recreation
+		if blueprint_instance:
+			blueprint_instance.queue_free()
+			blueprint_instance = null
+			
+	selected_building = building_data
+	is_build_mode = true
+	print("Selected from menu: %s" % building_data.name)
+
+# --- Blueprint Logic ---
+var blueprint_instance: Node2D = null
+
+func _update_blueprint() -> void:
+	# 1. Check if we should show blueprint
+	if not is_build_mode or not selected_building:
+		if blueprint_instance:
+			blueprint_instance.queue_free()
+			blueprint_instance = null
+		return
+
+	# 2. Create blueprint if needed
+	if not blueprint_instance:
+		if selected_building.scene:
+			blueprint_instance = selected_building.scene.instantiate()
+			add_child(blueprint_instance)
+			# Make it semi-transparent
+			blueprint_instance.modulate.a = 0.5
+			# Disable processing/physics for the ghost
+			blueprint_instance.process_mode = Node.PROCESS_MODE_DISABLED
+	
+	# 3. Check if the blueprint matches the selected building (in case we switched)
+	# (This is a bit tricky if we don't store the source. For now, assume recreation on switch is handled by queue_free elsewhere or simple check)
+	# A simple way is to check a custom property or just free it if we switch. 
+	# For now, let's just trust it or re-instantiate if needed.
+	# Ideally, we'd store `current_blueprint_id`
+	
+	if blueprint_instance:
+		# 4. Snap to grid
+		if mycelium_manager:
+			var grid_pos = mycelium_manager.mycelium_layer.local_to_map(mouse_world_pos)
+			blueprint_instance.position = mycelium_manager.mycelium_layer.map_to_local(grid_pos)
+		else:
+			blueprint_instance.position = mouse_world_pos
+			
+		# 5. Check validity
+		var is_valid = false
+		if building_manager:
+			# Special case for Mother Egg
+			if not is_game_started and selected_building.id == "mother_egg":
+				is_valid = true # Can place anywhere initially (mostly)
+			else:
+				is_valid = building_manager.can_place_building(mouse_world_pos, selected_building)
+		
+		# 6. Update Visuals
+		if is_valid:
+			blueprint_instance.modulate = Color(0.5, 1.0, 0.5, 0.6) # Greenish
+		else:
+			blueprint_instance.modulate = Color(1.0, 0.5, 0.5, 0.6) # Reddish

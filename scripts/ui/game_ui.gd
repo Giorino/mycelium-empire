@@ -10,8 +10,18 @@ extends Control
 var action_panel: Panel
 var spawn_button: Button
 var selected_egg: Node = null # Reference to selected Mother Egg
+var build_menu: BuildMenu
+
+const BUILD_MENU_SCENE = preload("res://scenes/ui/build_menu.tscn")
+
+signal building_selected_from_menu(building_data: BuildingData)
 
 func _ready() -> void:
+	# Instantiate Build Menu
+	build_menu = BUILD_MENU_SCENE.instantiate()
+	add_child(build_menu)
+	build_menu.building_selected.connect(func(data): emit_signal("building_selected_from_menu", data))
+	
 	if mycelium_manager:
 		mycelium_manager.nutrients_changed.connect(_on_nutrients_changed)
 		# Initialize display
@@ -76,6 +86,9 @@ func _on_nutrients_changed(current: int, _max: int) -> void:
 			cost = selected_egg.minion_cost
 		spawn_button.disabled = current < cost
 
+	if build_menu:
+		build_menu.update_affordability(current)
+
 func _on_xp_gained(current: float, target: float) -> void:
 	if xp_bar:
 		xp_bar.max_value = target
@@ -115,3 +128,7 @@ func _on_spawn_button_pressed() -> void:
 			print("GameUI: Selected egg missing spawn_minion method!")
 	else:
 		print("GameUI: No selected egg!")
+
+func toggle_build_menu() -> void:
+	if build_menu:
+		build_menu.toggle()

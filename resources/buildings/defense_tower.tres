@@ -1,16 +1,20 @@
-[gd_resource type="Resource" script_class="BuildingData" load_steps=3 format=3 uid="uid://dejs21p6kav5x"]
+[gd_resource type="Resource" script_class="BuildingData" load_steps=4 format=3 uid="uid://dejs21p6kav5x"]
 
 [ext_resource type="Script" path="res://scripts/resources/building_data.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://e9g0h1i2j3k4l" path="res://scenes/buildings/defense_tower.tscn" id="2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/defense_tower.png" id="3"]
 
 [resource]
 script = ExtResource("1")
 id = "defense_tower"
 name = "Defense Tower"
 description = "Shoots spores at nearby enemies."
+icon = ExtResource("3")
 scene = ExtResource("2")
 nutrient_cost = 75
 nutrient_generation_rate = 0
 storage_capacity = 0
 build_limit = -1
 growth_time = 3.0
+menu_order = 2
+is_visible_in_menu = true

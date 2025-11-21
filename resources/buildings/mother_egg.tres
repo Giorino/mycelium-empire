@@ -1,16 +1,20 @@
-[gd_resource type="Resource" script_class="BuildingData" load_steps=3 format=3 uid="uid://ca2bv5lyy2o8t"]
+[gd_resource type="Resource" script_class="BuildingData" load_steps=4 format=3 uid="uid://ca2bv5lyy2o8t"]
 
 [ext_resource type="Script" path="res://scripts/resources/building_data.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://b8k9l0m1n2o3p" path="res://scenes/buildings/mother_egg.tscn" id="2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/mother_egg.png" id="3"]
 
 [resource]
 script = ExtResource("1")
 id = "mother_egg"
 name = "Mother Egg"
 description = "The heart of the colony. Stores nutrients and starts the network."
+icon = ExtResource("3")
 scene = ExtResource("2")
 nutrient_cost = 0
 nutrient_generation_rate = 0
 storage_capacity = 500
 build_limit = 1
 growth_time = 3.0
+menu_order = 0
+is_visible_in_menu = true
