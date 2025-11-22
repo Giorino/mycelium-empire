@@ -8,11 +8,11 @@
 script = ExtResource("1")
 id = "spore_pod"
 name = "Spore Pod"
-description = "A living structure that houses minions. Increases population cap."
+description = "A living structure that houses minions. Requires a worker to generate 1 nutrient/sec."
 icon = ExtResource("3")
 scene = ExtResource("2")
 nutrient_cost = 50
-nutrient_generation_rate = 1
+nutrient_generation_rate = 0
 grid_size = Vector2i(2, 2)
 growth_time = 5.0
 menu_order = 1

@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=3 uid="uid://worker_bubble_ui_001"]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/minion.svg" id="1"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 12.0
+
+[node name="WorkerBubble" type="Node2D"]
+visible = false
+position = Vector2(0, -24)
+
+[node name="BubbleBackground" type="Polygon2D" parent="."]
+color = Color(0, 0.8, 1, 0.3)
+polygon = PackedVector2Array(-12, -12, -12, 12, 12, 12, 12, -12)
+
+[node name="BubbleOutline" type="Line2D" parent="."]
+points = PackedVector2Array(-12, -12, -12, 12, 12, 12, 12, -12, -12, -12)
+width = 2.0
+default_color = Color(0, 1, 1, 0.8)
+
+[node name="MinionSprite" type="Sprite2D" parent="."]
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("1")
+

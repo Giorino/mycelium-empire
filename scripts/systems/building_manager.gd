@@ -29,6 +29,13 @@ func _handle_resource_generation(delta: float) -> void:
 		var total_generated = 0
 		for grid_pos in building_data_map:
 			var data = building_data_map[grid_pos]
+			
+			# Skip buildings that manage their own generation (e.g., SporePod with workers)
+			var building_instance = buildings.get(grid_pos)
+			if building_instance and building_instance.has_method("has_worker"):
+				# This building manages its own generation
+				continue
+			
 			if data.get("nutrient_generation_rate") > 0:
 				total_generated += data.nutrient_generation_rate
 				

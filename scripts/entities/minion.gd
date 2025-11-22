@@ -14,6 +14,9 @@ enum State {
 	SEEKING_NUTRIENT,
 	MOVING_TO_TARGET,
 	HARVESTING,
+	SEEKING_WORK,
+	MOVING_TO_WORK,
+	WORKING,
 	STARVING
 }
 
@@ -47,6 +50,10 @@ var target_position: Vector2 = Vector2.ZERO
 var target_nutrient_tile: Vector2i = Vector2i(-999, -999)
 var harvest_timer: float = 0.0
 var upkeep_timer: float = 0.0
+
+# Work state
+var current_workplace: Node = null  # Reference to SporePod or other workplace
+var is_working: bool = false
 
 # References
 var cave_world: Node = null
@@ -168,14 +175,21 @@ func _update_state(delta: float) -> void:
 			_state_moving_to_target(delta)
 		State.HARVESTING:
 			_state_harvesting(delta)
+		State.SEEKING_WORK:
+			_state_seeking_work(delta)
+		State.MOVING_TO_WORK:
+			_state_moving_to_work(delta)
+		State.WORKING:
+			_state_working(delta)
 
 
-## IDLE: Actively seek nutrients (not passive anymore)
+## IDLE: Actively seek work or nutrients
 func _state_idle(_delta: float) -> void:
-	# Always try to find work (nutrients to harvest)
+	# Prioritize: Work > Harvesting
 	# Small delay before seeking again to prevent constant state switching
 	if randf() < 0.05:  # ~5% chance per frame (roughly 3 checks per second)
-		_change_state(State.SEEKING_NUTRIENT)
+		# First check for work opportunities (higher priority)
+		_change_state(State.SEEKING_WORK)
 
 
 ## SEEKING_NUTRIENT: Look for nearby nutrient veins
@@ -253,6 +267,85 @@ func _state_harvesting(delta: float) -> void:
 	if harvest_timer >= harvest_duration:
 		# Harvest complete
 		_complete_harvest()
+
+
+## SEEKING_WORK: Look for empty work slots in nearby buildings
+func _state_seeking_work(_delta: float) -> void:
+	# Find nearest available workplace
+	var workplace = _find_nearest_workplace()
+	
+	if workplace != null:
+		current_workplace = workplace
+		
+		# Find path to workplace
+		target_position = workplace.global_position
+		path = _calculate_path(position, target_position)
+		path_index = 0
+		
+		if path.is_empty():
+			print("No path found to workplace")
+			current_workplace = null
+			_change_state(State.SEEKING_NUTRIENT)  # Fall back to harvesting
+		else:
+			print("Path found to workplace with %d waypoints" % path.size())
+			_change_state(State.MOVING_TO_WORK)
+	else:
+		# No work available, look for nutrients instead
+		_change_state(State.SEEKING_NUTRIENT)
+
+
+## MOVING_TO_WORK: Navigate to workplace
+func _state_moving_to_work(delta: float) -> void:
+	# Validate workplace still exists and has space
+	if not is_instance_valid(current_workplace):
+		print("Workplace destroyed while moving to it")
+		current_workplace = null
+		_change_state(State.IDLE)
+		return
+	
+	if current_workplace.has_method("can_accept_worker"):
+		if not current_workplace.can_accept_worker():
+			print("Workplace slot filled while moving to it")
+			current_workplace = null
+			_change_state(State.IDLE)
+			return
+	
+	# Move toward target using pathfinding
+	_move_along_path(delta)
+	
+	# Check if reached workplace
+	if path_index >= path.size() and position.distance_to(target_position) < 32.0:
+		# Arrived at workplace
+		_start_working()
+		return
+	
+	# If path is empty or we're stuck, give up
+	if path.is_empty():
+		print("Minion has no path to workplace - returning to idle")
+		current_workplace = null
+		_change_state(State.IDLE)
+		return
+
+
+## WORKING: Stay at workplace and let it generate resources
+func _state_working(_delta: float) -> void:
+	# Stop moving
+	velocity = Vector2.ZERO
+	
+	# Validate workplace still exists
+	if not is_instance_valid(current_workplace):
+		print("Workplace destroyed while working")
+		_stop_working_internal()
+		_change_state(State.IDLE)
+		return
+	
+	# Check if we should leave (hunger, better opportunities, etc.)
+	# For now, minions work indefinitely until the building is destroyed
+	# or they die
+	
+	# Stay positioned at workplace
+	if current_workplace:
+		position = current_workplace.global_position
 
 
 ## Find nearest nutrient vein within sight range AND reserve it atomically
@@ -579,6 +672,77 @@ func _release_reservation() -> void:
 			cave_world.release_nutrient(target_nutrient_tile, self)
 
 
+## Find nearest available workplace (e.g., Spore Pod with empty slot)
+func _find_nearest_workplace() -> Node:
+	if not cave_world:
+		return null
+	
+	var building_manager = cave_world.get_node_or_null("BuildingManager")
+	if not building_manager:
+		return null
+	
+	var nearest_workplace: Node = null
+	var nearest_distance: float = INF
+	
+	# Check all buildings for available work slots
+	for building in building_manager.buildings.values():
+		if not is_instance_valid(building):
+			continue
+		
+		# Check if building has worker system and can accept workers
+		if building.has_method("can_accept_worker") and building.can_accept_worker():
+			var distance = position.distance_to(building.global_position)
+			
+			if distance < nearest_distance and distance < sight_range:
+				nearest_distance = distance
+				nearest_workplace = building
+	
+	return nearest_workplace
+
+
+## Start working at current workplace
+func _start_working() -> void:
+	if not is_instance_valid(current_workplace):
+		_change_state(State.IDLE)
+		return
+	
+	# Assign self to workplace
+	if current_workplace.has_method("assign_worker"):
+		var success = current_workplace.assign_worker(self)
+		if success:
+			is_working = true
+			visible = false  # Hide minion while working (shown in bubble instead)
+			_change_state(State.WORKING)
+			print("Minion %s: Started working at %s" % [get_instance_id(), current_workplace.name])
+		else:
+			print("Minion %s: Failed to assign to workplace" % get_instance_id())
+			current_workplace = null
+			_change_state(State.IDLE)
+	else:
+		print("Minion %s: Workplace doesn't have assign_worker method" % get_instance_id())
+		current_workplace = null
+		_change_state(State.IDLE)
+
+
+## Stop working (called externally when workplace is destroyed or minion reassigned)
+func stop_working() -> void:
+	_stop_working_internal()
+	visible = true  # Make minion visible again
+	_change_state(State.IDLE)
+
+
+## Internal helper to clean up work state
+func _stop_working_internal() -> void:
+	if is_working and is_instance_valid(current_workplace):
+		if current_workplace.has_method("remove_worker"):
+			current_workplace.remove_worker()
+	
+	is_working = false
+	current_workplace = null
+	visible = true  # Make sure minion is visible again
+	print("Minion %s: Stopped working" % get_instance_id())
+
+
 ## Change state
 func _change_state(new_state: State) -> void:
 	if current_state == new_state:
@@ -599,6 +763,13 @@ func _change_state(new_state: State) -> void:
 			# If we leave moving to target (e.g. interruption), release reservation UNLESS we're harvesting
 			if new_state != State.HARVESTING:
 				_release_reservation()
+		State.WORKING:
+			# Clean up work state when leaving
+			_stop_working_internal()
+		State.MOVING_TO_WORK:
+			# If we're interrupted while moving to work, clear workplace
+			if new_state != State.WORKING:
+				current_workplace = null
 
 	# Enter new state
 	current_state = new_state
@@ -616,6 +787,10 @@ func _change_state(new_state: State) -> void:
 			path.clear()
 			path_index = 0
 			target_nutrient_tile = Vector2i(-999, -999)  # Clear old target when starting new search
+		State.SEEKING_WORK:
+			path.clear()
+			path_index = 0
+			current_workplace = null
 
 
 ## Die
@@ -624,6 +799,7 @@ func _die(reason: String) -> void:
 		return
 
 	_release_reservation() # Clean up any reservations
+	_stop_working_internal()  # Clean up work state
 	is_alive = false
 	print("Minion died: ", reason)
 
@@ -687,6 +863,12 @@ func _update_visuals(delta: float) -> void:
 			_animate_harvesting(delta)
 		State.SEEKING_NUTRIENT:
 			_animate_idle_bounce(delta)  # Similar to idle
+		State.SEEKING_WORK:
+			_animate_idle_bounce(delta)  # Similar to idle
+		State.MOVING_TO_WORK:
+			_animate_movement(delta)  # Similar to moving
+		State.WORKING:
+			_animate_idle_bounce(delta)  # Gentle bounce while working
 
 	# Subtle hunger-based scale reduction
 	var hunger_scale = 1.0 - (hunger_percent * 0.15)  # Shrink up to 15% when starving
@@ -769,4 +951,7 @@ func _state_to_string(state: State) -> String:
 		State.SEEKING_NUTRIENT: return "Seeking Nutrient"
 		State.MOVING_TO_TARGET: return "Moving"
 		State.HARVESTING: return "Harvesting"
+		State.SEEKING_WORK: return "Seeking Work"
+		State.MOVING_TO_WORK: return "Moving to Work"
+		State.WORKING: return "Working"
 		_: return "Unknown"
