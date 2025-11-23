@@ -19,8 +19,6 @@ signal nutrients_changed(current: int, max: int)
 
 @export_group("Visual Settings")
 @export var enable_glow: bool = true
-@export var glow_energy: float = 0.005 # 1.5
-@export var glow_radius: float = 20.0 # 32.0
 @export var particle_amount: int = 16
 
 # References
@@ -47,15 +45,10 @@ var active_growth_frontier: Array[Vector2i] = []  # Tiles that can spread
 var current_nutrients: int = 0
 var max_nutrients: int = 0 # Determined by buildings (starts at 0)
 
-# Light pool for performance
-var light_pool: Array[PointLight2D] = []
-var active_lights: Dictionary = {}  # Vector2i -> PointLight2D
-
 
 func _ready() -> void:
 	current_nutrients = starting_nutrients
 	nutrients_changed.emit(current_nutrients, starting_nutrients)
-	_initialize_light_pool()
 	_apply_glow_shader()
 
 
@@ -81,58 +74,6 @@ func _apply_glow_shader() -> void:
 
 		mycelium_layer.material = material
 		print("Mycelium glow shader applied!")
-
-
-## Initialize pool of light nodes for performance
-func _initialize_light_pool() -> void:
-	# Pre-create 100 lights for pooling
-	for i in range(100):
-		var light = PointLight2D.new()
-		light.enabled = false
-		light.texture = _create_light_gradient()
-		light.texture_scale = 2.0
-		light.energy = glow_energy
-		light.color = Color(0.0, 0.8, 1.0)  # Cyan glow
-		light.range_layer_max = 2
-		add_child(light)
-		light_pool.append(light)
-
-
-## Create a radial gradient texture for lights
-func _create_light_gradient() -> GradientTexture2D:
-	var gradient = Gradient.new()
-	gradient.set_color(0, Color(1, 1, 1, 1))
-	gradient.set_color(1, Color(1, 1, 1, 0))
-
-	var gradient_texture = GradientTexture2D.new()
-	gradient_texture.gradient = gradient
-	gradient_texture.fill = GradientTexture2D.FILL_RADIAL
-	gradient_texture.width = 64
-	gradient_texture.height = 64
-
-	return gradient_texture
-
-
-## Get a light from the pool
-func _get_light_from_pool() -> PointLight2D:
-	for light in light_pool:
-		if not light.enabled:
-			return light
-
-	# Pool exhausted, create new light
-	var light = PointLight2D.new()
-	light.texture = _create_light_gradient()
-	light.texture_scale = 2.0
-	light.energy = glow_energy
-	light.color = Color(0.0, 0.8, 1.0)
-	add_child(light)
-	light_pool.append(light)
-	return light
-
-
-## Return light to pool
-func _return_light_to_pool(light: PointLight2D) -> void:
-	light.enabled = false
 
 
 ## Update mycelium growth over time
@@ -263,29 +204,9 @@ func _place_mycelium_at(grid_pos: Vector2i, with_particles: bool = true) -> void
 	# Update neighboring mycelium tiles to connect to this new one
 	_refresh_mycelium_neighbors(grid_pos)
 
-	# Add glow light
-	if enable_glow:
-		_add_light_at(grid_pos)
-
 	# Spawn particles
 	if with_particles:
 		_spawn_placement_particles(grid_pos)
-
-
-## Add dynamic light at tile position
-func _add_light_at(grid_pos: Vector2i) -> void:
-	var light = _get_light_from_pool()
-	light.position = mycelium_layer.map_to_local(grid_pos)
-	light.enabled = true
-	active_lights[grid_pos] = light
-
-
-## Remove light at position
-func _remove_light_at(grid_pos: Vector2i) -> void:
-	if active_lights.has(grid_pos):
-		var light = active_lights[grid_pos]
-		_return_light_to_pool(light)
-		active_lights.erase(grid_pos)
 
 
 ## Calculate bitmask for mycelium autotiling based on neighbors
@@ -387,9 +308,6 @@ func remove_mycelium_at(world_pos: Vector2) -> bool:
 	# Remove tile
 	mycelium_layer.erase_cell(grid_pos)
 
-	# Remove light
-	_remove_light_at(grid_pos)
-
 	# Update neighboring tiles to disconnect from this removed tile
 	_refresh_mycelium_neighbors(grid_pos)
 
@@ -404,14 +322,6 @@ func clear_all() -> void:
 	# Clear tracking data
 	mycelium_tiles.clear()
 	active_growth_frontier.clear()
-
-	# Return all active lights to the pool by iterating over a copy of the keys.
-	# This prevents issues with modifying the dictionary while iterating over it.
-	var light_positions = active_lights.keys()
-	for grid_pos in light_positions:
-		_remove_light_at(grid_pos)
-	
-	active_lights.clear()
 
 
 ## Check if position has mycelium
